@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "capaj.graphql-codegen-vscode",
+    "statelyai.stately-vscode",
+    "eamodio.gitlens",
+    "naumovs.color-highlight",
+    "graphql.vscode-graphql",
+    "dbaeumer.vscode-eslint"
+  ]
+}
