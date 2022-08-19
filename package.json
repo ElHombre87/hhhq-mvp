@@ -17,6 +17,7 @@
     "test": "npm run prettier:check && npm run lint && npm run typecheck && npm run jest",
     "storybook": "export NODE_OPTIONS=--openssl-legacy-provider && start-storybook -p 7001 --host localhost -s ./public",
     "storybook:build": "build-storybook",
+    "preinstall": "npx only-allow pnpm",
     "postinstall": "xstate typegen \"./src/**/*.ts?(x)\""
   },
   "dependencies": {
