@@ -2,47 +2,36 @@
 
 export interface Typegen0 {
   '@@xstate/typegen': true;
-  eventsCausingActions: {
-    notifyError:
-      | 'error.platform.detect-provider'
-      | 'error.platform.setup-provider-events'
-      | 'error.platform.manual-connect';
-    assignValues: 'connected';
-    assignAccounts: 'changeAccounts';
-    assignChain: 'changeChain';
-    assignAccountBalance: 'updateBalance';
-    resetContext: 'disconnect';
-  };
   internalEvents: {
-    'error.platform.detect-provider': { type: 'error.platform.detect-provider'; data: unknown };
-    'error.platform.setup-provider-events': {
-      type: 'error.platform.setup-provider-events';
-      data: unknown;
-    };
-    'error.platform.manual-connect': { type: 'error.platform.manual-connect'; data: unknown };
+    '': { type: '' };
     'done.invoke.detect-provider': {
       type: 'done.invoke.detect-provider';
       data: unknown;
       __tip: 'See the XState TS docs to learn how to strongly type this.';
     };
-    '': { type: '' };
     'done.invoke.manual-connect': {
       type: 'done.invoke.manual-connect';
       data: unknown;
       __tip: 'See the XState TS docs to learn how to strongly type this.';
     };
-    'xstate.init': { type: 'xstate.init' };
     'done.invoke.setup-provider-events': {
       type: 'done.invoke.setup-provider-events';
       data: unknown;
       __tip: 'See the XState TS docs to learn how to strongly type this.';
     };
+    'error.platform.detect-provider': { type: 'error.platform.detect-provider'; data: unknown };
+    'error.platform.manual-connect': { type: 'error.platform.manual-connect'; data: unknown };
+    'error.platform.setup-provider-events': {
+      type: 'error.platform.setup-provider-events';
+      data: unknown;
+    };
+    'xstate.init': { type: 'xstate.init' };
   };
   invokeSrcNameMap: {
-    detectProvider: 'done.invoke.detect-provider';
-    setupProvider: 'done.invoke.setup-provider-events';
     connect: 'done.invoke.manual-connect';
+    detectProvider: 'done.invoke.detect-provider';
     pollAccountInfo: 'done.invoke.metamask-connector.ready.connected:invocation[0]';
+    setupProvider: 'done.invoke.setup-provider-events';
   };
   missingImplementations: {
     actions: 'notifyError';
@@ -50,21 +39,32 @@ export interface Typegen0 {
     guards: never;
     delays: never;
   };
+  eventsCausingActions: {
+    assignAccountBalance: 'updateBalance';
+    assignAccounts: 'changeAccounts';
+    assignChain: 'changeChain';
+    assignValues: 'connected';
+    notifyError:
+      | 'error.platform.detect-provider'
+      | 'error.platform.manual-connect'
+      | 'error.platform.setup-provider-events';
+    resetContext: 'disconnect';
+  };
   eventsCausingServices: {
-    detectProvider: 'xstate.init';
-    setupProvider: 'done.invoke.detect-provider';
     connect: 'connect';
+    detectProvider: 'xstate.init';
     pollAccountInfo: '' | 'done.invoke.manual-connect';
+    setupProvider: 'done.invoke.detect-provider';
   };
   eventsCausingGuards: {};
   eventsCausingDelays: {};
   matchesStates:
+    | 'error'
     | 'init'
     | 'ready'
-    | 'ready.disconnected'
-    | 'ready.connecting'
     | 'ready.connected'
-    | 'error'
-    | { ready?: 'disconnected' | 'connecting' | 'connected' };
+    | 'ready.connecting'
+    | 'ready.disconnected'
+    | { ready?: 'connected' | 'connecting' | 'disconnected' };
   tags: never;
 }

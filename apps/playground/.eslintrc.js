@@ -1,5 +1,6 @@
 module.exports = {
   extends: [
+    'custom',
     'eslint:recommended',
     'mantine',
     'plugin:@next/next/recommended',

@@ -1,8 +1,9 @@
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
+const withTM = require("next-transpile-modules")();
 
-module.exports = withBundleAnalyzer({
+module.exports = withTM(withBundleAnalyzer({
   reactStrictMode: true,
   eslint: {
     ignoreDuringBuilds: true,
@@ -19,4 +20,4 @@ module.exports = withBundleAnalyzer({
   webpackDevMiddleware: (config) => {
     return config;
   },
-});
+}));
