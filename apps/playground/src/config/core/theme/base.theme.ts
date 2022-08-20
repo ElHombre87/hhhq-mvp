@@ -1,4 +1,4 @@
-import type { MantineThemeOverride } from '@mantine/styles/lib/theme/types/MantineTheme';
+import type { MantineThemeOverride } from '@mantine/core';
 import { Tuple, DefaultMantineColor } from '@mantine/core';
 
 export type CustomColor = DefaultMantineColor;
