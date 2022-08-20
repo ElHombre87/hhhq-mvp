@@ -2,16 +2,6 @@
 
 export interface Typegen0 {
   '@@xstate/typegen': true;
-  eventsCausingActions: {
-    updateSize: 'CHANGE_SIZE';
-    setupChoices: 'RESET' | 'CHANGE_SIZE' | 'NEW_GAME' | 'START';
-    solve: 'SOLVE';
-    handleCellClicked: 'CELL_CLICKED';
-    evaluateSelected: 'CELL_CLICKED';
-    evaluateProgress: 'CELL_CLICKED';
-    setupNewGrid: 'CHANGE_SIZE' | 'NEW_GAME' | 'START';
-    setupHints: 'CHANGE_SIZE' | 'NEW_GAME' | 'START';
-  };
   internalEvents: {
     'xstate.init': { type: 'xstate.init' };
   };
@@ -22,9 +12,19 @@ export interface Typegen0 {
     guards: never;
     delays: never;
   };
+  eventsCausingActions: {
+    evaluateProgress: 'CELL_CLICKED';
+    evaluateSelected: 'CELL_CLICKED';
+    handleCellClicked: 'CELL_CLICKED';
+    setupChoices: 'CHANGE_SIZE' | 'NEW_GAME' | 'RESET' | 'START';
+    setupHints: 'CHANGE_SIZE' | 'NEW_GAME' | 'START';
+    setupNewGrid: 'CHANGE_SIZE' | 'NEW_GAME' | 'START';
+    solve: 'SOLVE';
+    updateSize: 'CHANGE_SIZE';
+  };
   eventsCausingServices: {};
   eventsCausingGuards: {};
   eventsCausingDelays: {};
-  matchesStates: 'idle' | 'setup' | 'playing' | 'ended';
+  matchesStates: 'ended' | 'idle' | 'playing' | 'setup';
   tags: never;
 }

@@ -2,13 +2,6 @@
 
 export interface Typegen0 {
   '@@xstate/typegen': true;
-  eventsCausingActions: {
-    increment: 'INCREMENT';
-    decrement: 'DECREMENT';
-    setValue: 'SET_VALUE';
-    setMax: 'SET_MAX';
-    setMin: 'SET_MIN';
-  };
   internalEvents: {
     '': { type: '' };
     'xstate.init': { type: 'xstate.init' };
@@ -20,10 +13,17 @@ export interface Typegen0 {
     guards: never;
     delays: never;
   };
+  eventsCausingActions: {
+    decrement: 'DECREMENT';
+    increment: 'INCREMENT';
+    setMax: 'SET_MAX';
+    setMin: 'SET_MIN';
+    setValue: 'SET_VALUE';
+  };
   eventsCausingServices: {};
   eventsCausingGuards: {
-    isMin: '';
     isMax: '';
+    isMin: '';
   };
   eventsCausingDelays: {};
   matchesStates: 'counting' | 'max' | 'min';

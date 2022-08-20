@@ -9,6 +9,7 @@ import {
   TablerIcon,
   ListCheck,
   PlayerPlay,
+  ThreeDCubeSphere,
   Puzzle2
 } from 'tabler-icons-react';
 
@@ -72,6 +73,14 @@ const links: TNavLink[] = [
   //   group: 'playground',
   //   subitem: true,
   // }),
+  Link({
+    label: 'ThreeJS',
+    icon: ThreeDCubeSphere,
+    href: '/threejs',
+    description: 'ThreeJS playground',
+    group: 'playground',
+    subitem: true,
+  }),
   Link({
     label: 'Rick & Morty',
     icon: DeviceTv,
