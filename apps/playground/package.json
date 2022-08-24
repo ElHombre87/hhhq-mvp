@@ -21,13 +21,13 @@
     "postinstall": "xstate typegen \"./src/**/*.ts?(x)\""
   },
   "dependencies": {
-    "@metamask/detect-provider": "^1.2.0",
     "@modulz/radix-icons": "^4.0.0",
     "@next/bundle-analyzer": "^12.1.4",
     "@react-three/drei": "^9.23.1",
     "@react-three/fiber": "^8.4.0",
     "@storybook/addon-interactions": "^6.5.9",
     "@types/seedrandom": "^3.0.2",
+    "@types/three": "^0.143.1",
     "@xstate/cli": "^0.2.1",
     "@xstate/inspect": "^0.7.0",
     "@xstate/react": "^3.0.0",
