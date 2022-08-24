@@ -50,61 +50,6 @@ const Link = (link: TPartialLink): TNavLink => ({
 
 const links: TNavLink[] = [
   Link({ label: 'Home', icon: Home, href: '/' }),
-  Link({
-    label: 'Playground',
-    icon: PlayerPlay,
-    href: '/playground',
-    description: 'Testing ground for stuff',
-  }),
-  Link({
-    label: 'Todo App',
-    icon: ListCheck,
-    href: '/playground/todo',
-    description: 'A simple todo app',
-    group: 'playground',
-    subitem: true,
-  }),
-  // Link({
-  //   label: 'Reddit Deck',
-  //   icon: BrandReddit,
-  //   href: '/playground/reddit',
-  //   description: 'Quickly explore subreddits',
-  //   group: 'playground',
-  //   subitem: true,
-  // }),
-  Link({
-    label: 'Rick & Morty',
-    icon: DeviceTv,
-    href: '/playground/rick-and-morty',
-    description: 'Rick & Morty API viewer',
-    group: 'playground',
-    subitem: true,
-  }),
-  Link({
-    label: 'Picross',
-    icon: Puzzle2,
-    href: '/games/picross',
-    description: 'Picross puzzle game',
-    group: 'Games',
-  }),
-  Link({
-    label: 'Web3 Testing',
-    icon: Bolt,
-    href: '/web3',
-    description: 'Testing custom web3 implementation',
-    group: 'Web3',
-  }),
-  /** Testing nested navigation links with submeno */
-  // Link({
-  //   label: 'playground',
-  //   icon: PlayerPlay,
-  //   href: '/playground/',
-  //   description: 'Testing ground for stuff'
-  //   open: true,
-  //   links: [
-  //     Link({ label: 'Todo App', icon: ListCheck, href: '/playground/todo' }),
-  //   ]
-  // }),
 ];
 
 export default links;
