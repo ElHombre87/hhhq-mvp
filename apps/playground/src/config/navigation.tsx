@@ -9,6 +9,7 @@ import {
   TablerIcon,
   ListCheck,
   PlayerPlay,
+  ThreeDCubeSphere,
   Puzzle2
 } from 'tabler-icons-react';
 
@@ -50,6 +51,12 @@ const Link = (link: TPartialLink): TNavLink => ({
 
 const links: TNavLink[] = [
   Link({ label: 'Home', icon: Home, href: '/' }),
+  Link({
+    label: 'ThreeJS',
+    icon: ThreeDCubeSphere,
+    href: '/threejs/test',
+    description: 'ThreeJS playground',
+  }),
 ];
 
 export default links;
