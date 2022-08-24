@@ -52,6 +52,12 @@ const Link = (link: TPartialLink): TNavLink => ({
 const links: TNavLink[] = [
   Link({ label: 'Home', icon: Home, href: '/' }),
   Link({
+    label: 'ThreeJS',
+    icon: ThreeDCubeSphere,
+    href: '/threejs/test',
+    description: 'ThreeJS playground',
+  }),
+  Link({
     label: 'Playground',
     icon: PlayerPlay,
     href: '/playground',
@@ -73,14 +79,7 @@ const links: TNavLink[] = [
   //   group: 'playground',
   //   subitem: true,
   // }),
-  Link({
-    label: 'ThreeJS',
-    icon: ThreeDCubeSphere,
-    href: '/threejs',
-    description: 'ThreeJS playground',
-    group: 'playground',
-    subitem: true,
-  }),
+
   Link({
     label: 'Rick & Morty',
     icon: DeviceTv,
