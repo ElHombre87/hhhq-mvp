@@ -21,8 +21,6 @@
     "postinstall": "xstate typegen \"./src/**/*.ts?(x)\""
   },
   "dependencies": {
-    "@apollo/client": "^3.6.7",
-    "@graphql-codegen/cli": "^2.6.2",
     "@mantine/core": "^4.2.7",
     "@mantine/dates": "^4.2.7",
     "@mantine/form": "^4.2.7",
@@ -38,12 +36,6 @@
     "@next/bundle-analyzer": "^12.1.4",
     "@storybook/addon-interactions": "^6.5.9",
     "@types/seedrandom": "^3.0.2",
-    "@web3-react/abstract-connector": "^6.0.7",
-    "@web3-react/core": "^6.1.9",
-    "@web3-react/injected-connector": "^6.0.7",
-    "@web3-react/metamask": "^8.0.0-beta.0",
-    "@web3-react/types": "^8.0.0-beta.0",
-    "@web3-react/walletconnect-connector": "^6.2.13",
     "@xstate/cli": "^0.2.1",
     "@xstate/inspect": "^0.7.0",
     "@xstate/react": "^3.0.0",
