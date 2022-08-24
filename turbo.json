@@ -19,6 +19,13 @@
     },
     "dev": {
       "cache": false
+    },
+    "storybook": {
+      "inputs": ["src/**/*.tsx", "src/**/*.ts", "test/**/*.ts", "test/**/*.tsx"]
+    },
+    "full": {
+      "dependsOn": ["dev", "storybook"],
+      "outputs": []
     }
   }
 }
