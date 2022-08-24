@@ -51,6 +51,7 @@ const Link = (link: TPartialLink): TNavLink => ({
 
 const links: TNavLink[] = [
   Link({ label: 'Home', icon: Home, href: '/' }),
+<<<<<<< HEAD
   Link({
     label: 'ThreeJS',
     icon: ThreeDCubeSphere,
@@ -113,6 +114,8 @@ const links: TNavLink[] = [
   //     Link({ label: 'Todo App', icon: ListCheck, href: '/playground/todo' }),
   //   ]
   // }),
+=======
+>>>>>>> main
 ];
 
 export default links;

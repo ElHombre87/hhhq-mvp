@@ -1,1 +1,0 @@
-export { RickAndMorty } from './TestView';
