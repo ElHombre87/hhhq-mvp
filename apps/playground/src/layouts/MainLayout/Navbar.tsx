@@ -5,6 +5,7 @@ import {
   Group,
   Drawer,
   ActionIcon,
+  Stack,
 } from '@mantine/core';
 import type { TSimpleNavLink } from 'config/navigation';
 
@@ -62,37 +63,34 @@ export function NavBar({
       {...other}
     >
       {/* <Navbar.Section my="md">
-        <Group direction="column" align="center" spacing="sm" />
+        nav header
       </Navbar.Section> */}
 
       <Navbar.Section grow component={ScrollArea}>
         {/* scrollable content here */}
-        <Group direction="column" align="center" spacing="sm">
+        <Stack align="center" spacing="sm">
           {links.map((link) => (
             <LinkItem {...link} key={link.label} onClick={onClick} active={link.href === active} />
           ))}
-        </Group>
+        </Stack>
       </Navbar.Section>
 
       <Navbar.Section my="md">
 
         <Group sx={{ width: '100%' }} spacing="sm" position="apart" px="xs">
           {showCollapse && showDefaultLinks && (
-            <ActionIcon onClick={navbar.collapse} variant="hover">
+            <ActionIcon onClick={navbar.collapse} variant="subtle">
               {navbar.collapsed ? <ChevronRight size={32} /> : <ChevronLeft size={32} />}
             </ActionIcon>
           )}
           <Group align="center" spacing="sm" position="apart">
             <ColorScheme.Button size="md" />
-            <ActionIcon variant="hover" disabled>
+            <ActionIcon variant="subtle" disabled>
               ?
             </ActionIcon>
           </Group>
         </Group>
         {/* Footer with user */}
-        {/* <Group position="apart">
-          <ColorSchemeToggle size='md'/>
-        </Group> */}
       </Navbar.Section>
     </Navbar>
   );
