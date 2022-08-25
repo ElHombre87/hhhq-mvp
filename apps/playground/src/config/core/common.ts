@@ -1,1 +1,1 @@
-export const APP_NAME = 'YOUR APP';
+export const APP_NAME = 'HackerHouseHQ';
