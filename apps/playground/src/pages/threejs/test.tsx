@@ -66,9 +66,9 @@ const Scene: React.FC = ({}) => {
         rotation={[0, Math.PI / 2, 0]}
         fov={90}
         near={0.1}
-        far={1000}
+        far={5000}
       />
-      <Stars />
+      <Stars radius={1000} depth={75} count={50_000} fade/>
       <Ship />
     </>
   )
