@@ -26,11 +26,16 @@ type GLTFResult = GLTF & {
   };
 };
 
+interface ShipProps {
+  colors?: {primary?: string, secondary?: string}
+}
+
+const defaultColors: ShipProps['colors'] = {primary: 'teal', secondary: 'white'}
 // One-click copy/paste from the poimandres market: https://market.pmnd.rs/model/low-poly-spaceship
-export const Ship = forwardRef<THREE.Group, any>((props, ref) => {
+export const Ship = forwardRef<THREE.Group, ShipProps>((props, ref) => {
   const { nodes, materials } = useGLTF('https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/low-poly-spaceship/model.gltf') as GLTFResult;
   const theme =  useMantineTheme()
-  console.info(theme)
+  const colors = {...defaultColors, ...props?.colors}
   useLayoutEffect(() => {
     Object.values(materials).forEach((material) => {
       material.roughness = 0.75
@@ -39,8 +44,8 @@ export const Ship = forwardRef<THREE.Group, any>((props, ref) => {
   return (
     <group ref={ref} {...props} dispose={null}>
       <mesh castShadow receiveShadow geometry={nodes.Cube005.geometry} material={materials.Mat0} />
-      <mesh castShadow receiveShadow geometry={nodes.Cube005_1.geometry} material={materials.Mat1} material-color={theme.colors.green[6]} />
-      <mesh castShadow receiveShadow geometry={nodes.Cube005_2.geometry} material={materials.Mat2} material-envMapIntensity={0.2} material-color="gray" />
+      <mesh castShadow receiveShadow geometry={nodes.Cube005_1.geometry} material={materials.Mat1} material-color={colors.secondary} />
+      <mesh castShadow receiveShadow geometry={nodes.Cube005_2.geometry} material={materials.Mat2} material-envMapIntensity={0.2} material-color={colors.primary} />
       <mesh castShadow receiveShadow geometry={nodes.Cube005_3.geometry} material={materials.Window_Frame} />
       <mesh castShadow receiveShadow geometry={nodes.Cube005_4.geometry} material={materials.Mat4} />
       <mesh castShadow receiveShadow geometry={nodes.Cube005_6.geometry} material={materials.Window} />
