@@ -33,10 +33,10 @@ const ShipComponent: React.FC = () => {
     Refs.mesh = meshRef;
   }, [ship])
   const inputs = useRef(new InputController({
-    fwd: 'KeyW',
-    left: 'KeyA',
-    back: 'KeyS',
-    right: 'KeyD',
+    fwd: ['KeyW', 'ArrowUp'],
+    left: ['KeyA', 'ArrowLeft'],
+    back: ['KeyS', 'ArrowDown'],
+    right: ['KeyD', 'ArrowRight'],
     boost: 'ShiftLeft',
     break: 'Space',
     turnLeft: 'KeyQ',

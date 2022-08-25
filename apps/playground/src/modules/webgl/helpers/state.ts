@@ -56,15 +56,15 @@ export class Speeds {
 
 
 export type Direction = 1 | 0 | -1;
-export interface InputConfig {
-  fwd: string;
-  back: string;
-  left: string;
-  right: string;
-  boost: string;
-  break: string;
-  turnLeft: string;
-  turnRight: string;
+export interface InputConfig<T extends string|string[] = string> {
+  fwd: T;
+  back: T;
+  left: T;
+  right: T;
+  boost: T;
+  break: T;
+  turnLeft: T;
+  turnRight: T;
 }
 export class InputController {
   public fwd: Direction = 0;
@@ -72,8 +72,12 @@ export class InputController {
   public turn: Direction = 0;
   public break: boolean = false;
   public multiplier: number = 1;
-  
-  constructor(public inputs: InputConfig) {}
+  private inputs: InputConfig<string[]>;
+  constructor(_inputs: InputConfig<string|string[]>) {
+    this.inputs = Object.entries(_inputs).reduce(
+      (p, [k, v]) => ({...p, [k]: Array.isArray(v) ? v : [v]}),
+      {} as InputConfig<string[]>);
+  }
   
   update = (event: KeyboardEvent) => {
     this.fwd = InputController.evaluate(this.inputs.fwd, this.fwd, event, 1, 0);
@@ -88,10 +92,10 @@ export class InputController {
     this.multiplier = InputController.evaluate(this.inputs.boost, this.multiplier, event, 2, 1);
   }
 
-  static evaluate<T>(key: string, current: T, event: KeyboardEvent, keydown: T, keyup: T): T {
+  static evaluate<T>(keys: string[], current: T, event: KeyboardEvent, keydown: T, keyup: T): T {
     const { code, type } = event;
-    if (code !== key) return current;
-    return code === key && type === 'keydown' ? keydown : keyup
+    if (!keys.includes(code)) return current;
+    return type === 'keydown' ? keydown : keyup
   }
 
 }
