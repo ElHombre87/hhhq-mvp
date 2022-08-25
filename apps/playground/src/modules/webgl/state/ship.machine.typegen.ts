@@ -2,10 +2,20 @@
 
 export interface Typegen0 {
   '@@xstate/typegen': true;
+  eventsCausingActions: {
+    assignRotation: 'SET_ROTATION';
+    assignPosition: 'SET_POSITION';
+    assignTransform: 'SET_TRANSFORM';
+    rotate: 'ROTATE';
+    resetAcceleration: '';
+    resetSpeed: 'xstate.init';
+    accelerate: 'START_ACCELERATE';
+    changeSpeed: 'START_ACCELERATE' | 'START_DECELERATE';
+    decelerate: 'START_DECELERATE';
+  };
   internalEvents: {
     '': { type: '' };
     'xstate.init': { type: 'xstate.init' };
-    'xstate.stop': { type: 'xstate.stop' };
   };
   invokeSrcNameMap: {};
   missingImplementations: {
@@ -13,17 +23,6 @@ export interface Typegen0 {
     services: never;
     guards: never;
     delays: never;
-  };
-  eventsCausingActions: {
-    accelerate: 'START_ACCELERATE';
-    assignPosition: 'SET_POSITION';
-    assignRotation: 'SET_ROTATION';
-    assignTransform: 'SET_TRANSFORM';
-    changeSpeed: 'START_ACCELERATE' | 'START_DECELERATE';
-    decelerate: 'START_DECELERATE';
-    resetAcceleration: '' | 'xstate.stop';
-    resetSpeed: '' | 'xstate.stop';
-    rotate: 'ROTATE';
   };
   eventsCausingServices: {};
   eventsCausingGuards: {
@@ -34,9 +33,9 @@ export interface Typegen0 {
   matchesStates:
     | 'idle'
     | 'moving'
+    | 'moving.default'
     | 'moving.accelerating'
     | 'moving.decelerating'
-    | 'moving.default'
-    | { moving?: 'accelerating' | 'decelerating' | 'default' };
+    | { moving?: 'default' | 'accelerating' | 'decelerating' };
   tags: never;
 }
