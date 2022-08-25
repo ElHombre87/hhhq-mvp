@@ -11,6 +11,7 @@ declare module '@mantine/core' {
   export interface MantineThemeColorsOverride {
     colors: ColorMap;
   }
+
   export interface MantineThemeOther {
     headerHeight: number;
     colors: {
