@@ -1,14 +1,13 @@
-import React, { forwardRef, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Float, FlyControls, OrbitControls, PerspectiveCamera, Stars, useGLTF} from "@react-three/drei";
+import { FlyControls, OrbitControls, PerspectiveCamera, Stars, Trail } from "@react-three/drei";
 import { MantineTheme, useMantineTheme } from "@mantine/core";
 import { isDarkTheme } from "utils/theme.utils";
 
 import { useWindowEvent } from "@mantine/hooks";
 import { Viper } from "modules/webgl/assets/viper";
 import { InputController, Speeds, Velocity } from "modules/webgl/helpers/state";
-import type { Movements } from "modules/webgl/helpers/state";
 import { degToRad } from "three/src/math/MathUtils";
 import { Ship } from "modules/webgl/assets/ship";
 
@@ -54,9 +53,22 @@ const ShipComponent: React.FC = () => {
   });
   const Player = useMemo(() => avatar ? Ship : Viper,[avatar])
   return (
+    <>
     <group ref={ship} scale={0.1}>
       <Player ref={meshRef}/>
     </group>
+    <Trail
+      width={1} // Width of the line
+      color={'#F8D628'} // Color of the line
+      length={2} // Length of the line
+      decay={0.1} // How fast the line fades away
+      local={true} // Wether to use the target's world or local positions
+      stride={0} // Min distance between previous and current point
+      interval={1} // Number of frames to wait before next calculation
+      target={ship} // Optional target. This object will produce the trail.
+      attenuation={(width) => width/3 * (shipState.fwd.current / shipState.fwd.max)} // A function to define the width in each point along it.
+    />
+    </>
   )
 }
 
