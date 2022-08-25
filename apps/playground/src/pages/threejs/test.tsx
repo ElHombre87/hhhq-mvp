@@ -97,13 +97,15 @@ const Scene: React.FC = ({}) => {
       <PerspectiveCamera
         makeDefault
         ref={Refs.camera}
-        position={[0, 500, -100]}
-        rotation={[0, Math.PI / 2, 0]}
+        // position={[0, 0, 0]}
+        // rotation={[0, 0, 0]}
         fov={90}
         near={0.1}
         far={5000}
       />
       <Stars radius={1000} depth={75} count={50_000} fade/>
+      {/* <Sparkles rotation={[0,0,Math.PI/4]} size={.75} count={10000} opacity={0.5} noise={1} speed={0.025} scale={50} /> */}
+     
       <ShipComponent />
       <Target />
     </>
@@ -117,7 +119,7 @@ export default function WebGLTestPage() {
   return (
     <Suspense fallback={null}>
       <Canvas ref={canvas} shadows style={{width: '100%', height: '100vh'}} onCreated={({gl}) => gl.setClearColor(color)}>
-        <gridHelper />
+        {/* <gridHelper /> */}
         <FlyControls movementSpeed={1} />
         <OrbitControls />
         <Scene />
