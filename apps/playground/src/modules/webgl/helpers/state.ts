@@ -63,10 +63,13 @@ export interface InputConfig {
   right: string;
   boost: string;
   break: string;
+  turnLeft: string;
+  turnRight: string;
 }
 export class InputController {
   public fwd: Direction = 0;
   public strafe: Direction = 0;
+  public turn: Direction = 0;
   public break: boolean = false;
   public multiplier: number = 1;
   
@@ -78,6 +81,10 @@ export class InputController {
     this.strafe = InputController.evaluate(this.inputs.left, this.strafe, event, 1, 0);
     this.strafe = InputController.evaluate(this.inputs.right, this.strafe, event, -1, 0);
     this.break = InputController.evaluate(this.inputs.break, this.break, event, true, false);
+
+    this.turn = InputController.evaluate(this.inputs.turnRight, this.turn, event, -1, 0);
+    this.turn = InputController.evaluate(this.inputs.turnLeft, this.turn, event, 1, 0);
+
     this.multiplier = InputController.evaluate(this.inputs.boost, this.multiplier, event, 2, 1);
   }
 

@@ -39,6 +39,8 @@ const ShipComponent: React.FC = () => {
     right: 'KeyD',
     boost: 'ShiftLeft',
     break: 'Space',
+    turnLeft: 'KeyQ',
+    turnRight: 'KeyE',
   }));
 
   useHandleInputs(inputs.current);
@@ -155,7 +157,9 @@ function useHandleInputs(inputs: InputController) {
   useWindowEvent('keydown', ({code}) => {
     switch(code) {
       case 'KeyZ':
-        Refs.ship!.current.position.set(0,0,0); break;
+        Refs.ship!.current.position.set(0,0,0);
+        Refs.ship!.current.rotation.set(0,0,0);
+        break;
       default: return;
     }
   });
@@ -172,5 +176,6 @@ function updateShipMovement(delta: number, inputs: InputController) {
   const MAX_YAW = degToRad(5);
   ship.translateZ(fwd.current * delta);
   ship.translateX(strafe.current * delta);
+  ship.rotation.y += (Math.PI / 365 /2) * inputs.turn;
   Refs.mesh.current.rotation.z = -MAX_YAW * (strafe.current / strafe.max);
 }
