@@ -7,7 +7,7 @@ import { isDarkTheme } from "utils/theme.utils";
 
 import { useWindowEvent } from "@mantine/hooks";
 import { Viper } from "modules/webgl/assets/viper";
-import { Speeds, Velocity } from "modules/webgl/helpers/state";
+import { InputController, Speeds, Velocity } from "modules/webgl/helpers/state";
 import type { Movements } from "modules/webgl/helpers/state";
 import { degToRad } from "three/src/math/MathUtils";
 import { Ship } from "modules/webgl/assets/ship";
@@ -19,6 +19,13 @@ const Refs = new (class RefsContainer {
   constructor() {}
 })
 
+const shipState = new Speeds(
+  // new Velocity(0.05),
+  // new Velocity(0.025, 0.05/100, 2),
+  new Velocity(5, 5/100, .5),
+  new Velocity(2.5, 5/100),
+);
+
 const ShipComponent: React.FC = () => {
   const ship = useRef<THREE.Group>(null!)
   const meshRef= useRef<THREE.Group>(null!);
@@ -26,13 +33,19 @@ const ShipComponent: React.FC = () => {
     Refs.ship = ship;
     Refs.mesh = meshRef;
   }, [ship])
-  const moves = useRef<Movements>({ fwd: 0, strafe: 0, multiplier: 1, break: false });
-  const SIZE = 2;
-  
-  useHandleInputs(moves.current);
+  const inputs = useRef(new InputController({
+    fwd: 'KeyW',
+    left: 'KeyA',
+    back: 'KeyS',
+    right: 'KeyD',
+    boost: 'ShiftLeft',
+    break: 'Space',
+  }));
+
+  useHandleInputs(inputs.current);
   useFrame((_, delta) => {
     if (!ship.current) return;
-    updateShipMovement(delta, moves.current);
+    updateShipMovement(delta, inputs.current);
   })
 
   const [avatar, setAvatar] = useState(true)
@@ -40,17 +53,10 @@ const ShipComponent: React.FC = () => {
     if (e.code === 'KeyT') setAvatar(p => !p)
   });
   const Player = useMemo(() => avatar ? Ship : Viper,[avatar])
-  // return (
-  //   <group ref={ship} scale={0.1}>
-  //     <Ship ref={meshRef}/>
-  //   </group>
-  // )
   return (
-    <>
-    <group ref={ship} scale={0.05}>
-      <Player meshRef={meshRef}/>
+    <group ref={ship} scale={0.1}>
+      <Player ref={meshRef}/>
     </group>
-    </>
   )
 }
 
@@ -62,7 +68,6 @@ const Target: React.FC = () => {
     </mesh>
   )
 }
-
 
 const Scene: React.FC = ({}) => {
   Refs.camera = useRef<THREE.Camera>(null!);
@@ -117,6 +122,7 @@ const useCanvasColor = (theme?: MantineTheme) => {
 // FUNCTIONS //////////////////////////////////////////////////////////////////
 
 
+/** updates the active camera transform to follow the 'player' */
 function updateFollowCamera(camera: THREE.Camera, target: THREE.Group) {
   if (!camera || !target) return;
   var relativeCameraOffset = new THREE.Vector3(0,12,-15);
@@ -125,60 +131,32 @@ function updateFollowCamera(camera: THREE.Camera, target: THREE.Group) {
   camera.lookAt(target.position);
 }
 
-function useHandleInputs(moves: Movements) {
+/**
+ * binds the InputController (and optionally other inputs) to the dom events
+ * through built-in mantine hooks
+ */
+function useHandleInputs(inputs: InputController) {
   
+  useWindowEvent('keydown', inputs.update);
+  useWindowEvent('keyup', inputs.update);
+
   useWindowEvent('keydown', ({code}) => {
     switch(code) {
-      case 'KeyW':
-        moves.fwd = 1; break;
-      case 'KeyS':
-        moves.fwd = -1; break;
-      case 'KeyA':
-        moves.strafe = 1; break;
-      case 'KeyD':
-        moves.strafe = -1; break;
-      case 'ShiftLeft':
-        moves.multiplier = 2; break;
-      case 'Space':
-        moves.break = true; break;
       case 'KeyZ':
         Refs.ship!.current.position.set(0,0,0); break;
       default: return;
     }
   });
-
-  useWindowEvent('keyup', ({code}) => {
-    switch(code) {
-      case 'KeyW':
-      case 'KeyS':
-        moves.fwd = 0; break;
-      case 'KeyA':
-      case 'KeyD':
-        moves.strafe = 0; break;
-      case 'ShiftLeft':
-        moves.multiplier = 1; break;
-      case 'Space':
-        moves.break = false;
-      default: return;
-    }
-  });
-
 }
 
-const SPEED = new Speeds(
-  // new Velocity(0.05),
-  // new Velocity(0.025, 0.05/100, 2),
-  new Velocity(5, 5/100, .5),
-  new Velocity(2.5, 5/100),
-)
-// function updateShipMovement(delta: number, ship: THREE.Group, moves: Movements) {
-function updateShipMovement(delta: number, moves: Movements) {
+/** updates ship transform to reflect user inputs */
+function updateShipMovement(delta: number, inputs: InputController) {
   const ship = Refs.ship?.current;
   const mesh = Refs.mesh?.current;
   if (!ship || !mesh) return;
 
-  SPEED.update(moves);
-  const { fwd, strafe } = SPEED;
+  shipState.update(inputs);
+  const { fwd, strafe } = shipState;
   const MAX_YAW = degToRad(5);
   ship.translateZ(fwd.current * delta);
   ship.translateX(strafe.current * delta);
