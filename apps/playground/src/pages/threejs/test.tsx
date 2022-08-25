@@ -126,7 +126,9 @@ function useHandleInputs(moves: Movements) {
       case 'ShiftLeft':
         moves.multiplier = 2; break;
       case 'Space':
-        moves.break = true;
+        moves.break = true; break;
+      case 'KeyZ':
+        Refs.ship!.current.position.set(0,0,0); break;
     }
   });
 
