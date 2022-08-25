@@ -1,7 +1,7 @@
-import { Suspense, useEffect, useRef } from "react";
+import React, { forwardRef, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber'
-import { FlyControls, OrbitControls, PerspectiveCamera, Stars} from "@react-three/drei";
+import { Float, FlyControls, OrbitControls, PerspectiveCamera, Stars, useGLTF} from "@react-three/drei";
 import { MantineTheme, useMantineTheme } from "@mantine/core";
 import { isDarkTheme } from "utils/theme.utils";
 
@@ -10,6 +10,7 @@ import { Viper } from "modules/webgl/assets/viper";
 import { Speeds, Velocity } from "modules/webgl/helpers/state";
 import type { Movements } from "modules/webgl/helpers/state";
 import { degToRad } from "three/src/math/MathUtils";
+import { Ship } from "modules/webgl/assets/ship";
 
 const Refs = new (class RefsContainer {
   ship: React.MutableRefObject<THREE.Group> = null!;
@@ -17,7 +18,8 @@ const Refs = new (class RefsContainer {
   camera: React.MutableRefObject<THREE.Camera> = null!;
   constructor() {}
 })
-const Ship: React.FC = () => {
+
+const ShipComponent: React.FC = () => {
   const ship = useRef<THREE.Group>(null!)
   const meshRef= useRef<THREE.Group>(null!);
   useEffect(() => {
@@ -28,21 +30,25 @@ const Ship: React.FC = () => {
   const SIZE = 2;
   
   useHandleInputs(moves.current);
-  useFrame((state, delta) => {
-    // const {clock, controls} = state;
+  useFrame((_, delta) => {
     if (!ship.current) return;
-    // updateShipMovement(delta, ship.current, moves.current);
     updateShipMovement(delta, moves.current);
   })
 
+  const [avatar, setAvatar] = useState(true)
+  useWindowEvent('keydown', (e) => {
+    if (e.code === 'KeyT') setAvatar(p => !p)
+  });
+  const Player = useMemo(() => avatar ? Ship : Viper,[avatar])
+  // return (
+  //   <group ref={ship} scale={0.1}>
+  //     <Ship ref={meshRef}/>
+  //   </group>
+  // )
   return (
     <>
     <group ref={ship} scale={0.05}>
-      <Viper meshRef={meshRef}/>
-    {/* <mesh ref={ship} position={[0, SIZE/2, 0]}>
-      <boxBufferGeometry args={[SIZE, SIZE, SIZE]} />
-      <meshStandardMaterial color="#0391BA" />
-    </mesh> */}
+      <Player meshRef={meshRef}/>
     </group>
     </>
   )
@@ -79,7 +85,7 @@ const Scene: React.FC = ({}) => {
         far={5000}
       />
       <Stars radius={1000} depth={75} count={50_000} fade/>
-      <Ship />
+      <ShipComponent />
       <Target />
     </>
   )
@@ -113,12 +119,9 @@ const useCanvasColor = (theme?: MantineTheme) => {
 
 function updateFollowCamera(camera: THREE.Camera, target: THREE.Group) {
   if (!camera || !target) return;
-  var relativeCameraOffset = new THREE.Vector3(0,15,-20);
-  var cameraOffset = relativeCameraOffset.applyMatrix4(target.matrixWorld);
-  camera.position.x = cameraOffset.x;
-  camera.position.y = cameraOffset.y;
-  camera.position.z = cameraOffset.z;
-  camera.rotation.z = 0;
+  var relativeCameraOffset = new THREE.Vector3(0,12,-15);
+  var offset = relativeCameraOffset.applyMatrix4(target.matrixWorld);
+  camera.position.set(offset.x, offset.y, offset.z)
   camera.lookAt(target.position);
 }
 
@@ -140,6 +143,7 @@ function useHandleInputs(moves: Movements) {
         moves.break = true; break;
       case 'KeyZ':
         Refs.ship!.current.position.set(0,0,0); break;
+      default: return;
     }
   });
 
@@ -155,6 +159,7 @@ function useHandleInputs(moves: Movements) {
         moves.multiplier = 1; break;
       case 'Space':
         moves.break = false;
+      default: return;
     }
   });
 
