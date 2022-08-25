@@ -53,3 +53,38 @@ export class Speeds {
     return this;
   }
 }
+
+
+export type Direction = 1 | 0 | -1;
+export interface InputConfig {
+  fwd: string;
+  back: string;
+  left: string;
+  right: string;
+  boost: string;
+  break: string;
+}
+export class InputController {
+  public fwd: Direction = 0;
+  public strafe: Direction = 0;
+  public break: boolean = false;
+  public multiplier: number = 1;
+  
+  constructor(public inputs: InputConfig) {}
+  
+  update = (event: KeyboardEvent) => {
+    this.fwd = InputController.evaluate(this.inputs.fwd, this.fwd, event, 1, 0);
+    this.fwd = InputController.evaluate(this.inputs.back, this.fwd, event, -1, 0);
+    this.strafe = InputController.evaluate(this.inputs.left, this.strafe, event, 1, 0);
+    this.strafe = InputController.evaluate(this.inputs.right, this.strafe, event, -1, 0);
+    this.break = InputController.evaluate(this.inputs.break, this.break, event, true, false);
+    this.multiplier = InputController.evaluate(this.inputs.boost, this.multiplier, event, 2, 1);
+  }
+
+  static evaluate<T>(key: string, current: T, event: KeyboardEvent, keydown: T, keyup: T): T {
+    const { code, type } = event;
+    if (code !== key) return current;
+    return code === key && type === 'keydown' ? keydown : keyup
+  }
+
+}
