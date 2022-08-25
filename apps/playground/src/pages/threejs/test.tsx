@@ -1,48 +1,44 @@
 import { Suspense, useEffect, useRef } from "react";
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Billboard, FlyControls, OrbitControls, PerspectiveCamera, Stars, Text } from "@react-three/drei";
+import { FlyControls, OrbitControls, PerspectiveCamera, Stars} from "@react-three/drei";
 import { MantineTheme, useMantineTheme } from "@mantine/core";
 import { isDarkTheme } from "utils/theme.utils";
 
 import { useWindowEvent } from "@mantine/hooks";
 import { Viper } from "modules/webgl/assets/viper";
+import { Speeds, Velocity } from "modules/webgl/helpers/state";
+import type { Movements } from "modules/webgl/helpers/state";
+import { degToRad } from "three/src/math/MathUtils";
 
 const Refs = new (class RefsContainer {
   ship: React.MutableRefObject<THREE.Group> = null!;
+  mesh: React.MutableRefObject<THREE.Group> = null!;
   camera: React.MutableRefObject<THREE.Camera> = null!;
   constructor() {}
 })
-enum MoveOptions {
-  STOP=0,
-  POS=1,
-  NEG=-1,
-}
-interface Movements {
-  fwd: MoveOptions
-  strafe: MoveOptions
-  multiplier: number
-  break: boolean
-
-}
-
 const Ship: React.FC = () => {
   const ship = useRef<THREE.Group>(null!)
-  useEffect(() => { Refs.ship = ship }, [ship])
+  const meshRef= useRef<THREE.Group>(null!);
+  useEffect(() => {
+    Refs.ship = ship;
+    Refs.mesh = meshRef;
+  }, [ship])
   const moves = useRef<Movements>({ fwd: 0, strafe: 0, multiplier: 1, break: false });
   const SIZE = 2;
   
   useHandleInputs(moves.current);
-  useFrame((state) => {
+  useFrame((state, delta) => {
     // const {clock, controls} = state;
     if (!ship.current) return;
-    updateShipMovement(ship.current, moves.current);
+    // updateShipMovement(delta, ship.current, moves.current);
+    updateShipMovement(delta, moves.current);
   })
 
   return (
     <>
     <group ref={ship} scale={0.05}>
-      <Viper />
+      <Viper meshRef={meshRef}/>
     {/* <mesh ref={ship} position={[0, SIZE/2, 0]}>
       <boxBufferGeometry args={[SIZE, SIZE, SIZE]} />
       <meshStandardMaterial color="#0391BA" />
@@ -151,36 +147,22 @@ function useHandleInputs(moves: Movements) {
 
 }
 
-const MAX_SPEED = 0.0525;
-const ACCELERATION = 0.005;
-const SPEED = {
-  fwd: 0,
-  strafe: 0
-}
-function getSpeed(moves: Movements): {fwd:number, strafe: number} {
-  function compute(curr: number, mod: number) {
-    return Math.min(MAX_SPEED, Math.max(curr + (ACCELERATION * mod), -MAX_SPEED))
-  }
-  function breaks(speed: number) {
-    if (!moves.break) return 0;
-    if (isNearly(speed, 0, ACCELERATION)) return -speed;
-    return speed > 0 ? -ACCELERATION : ACCELERATION;
-  }
-  SPEED.fwd = compute(SPEED.fwd, moves.fwd) + breaks(SPEED.fwd);
-  SPEED.strafe = compute(SPEED.strafe, moves.strafe) + breaks(SPEED.strafe);
-  return SPEED;
-}
+const SPEED = new Speeds(
+  // new Velocity(0.05),
+  // new Velocity(0.025, 0.05/100, 2),
+  new Velocity(5, 5/100, .5),
+  new Velocity(2.5, 5/100),
+)
+// function updateShipMovement(delta: number, ship: THREE.Group, moves: Movements) {
+function updateShipMovement(delta: number, moves: Movements) {
+  const ship = Refs.ship?.current;
+  const mesh = Refs.mesh?.current;
+  if (!ship || !mesh) return;
 
-function updateShipMovement(ship: THREE.Group, moves: Movements) {
-  // const delta = clock.getDelta(); // seconds.
-  // const moveDistance = 500 * delta; // 200 pixels per second
-  // const rotateAngle = Math.PI / 2 * delta; // pi/2 radians (90 degrees) per second
-  const speed = getSpeed(moves);
-  ship.translateZ(speed.fwd);
-  ship.translateX(speed.strafe);
-  // ship.rotation.z = Math.PI / 16
-}
-
-function isNearly(value: number, match: number, precision = 0.05) {
-  return (match - precision) <= value && value <= (match + precision);
+  SPEED.update(moves);
+  const { fwd, strafe } = SPEED;
+  const MAX_YAW = degToRad(2.5);
+  ship.translateZ(fwd.current * delta);
+  ship.translateX(strafe.current * delta);
+  Refs.mesh.current.rotation.z = -MAX_YAW * strafe.current;
 }
