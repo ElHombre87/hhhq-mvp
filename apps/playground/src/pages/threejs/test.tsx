@@ -48,6 +48,16 @@ const Ship: React.FC = () => {
   )
 }
 
+const Target: React.FC = () => {
+  return (
+    <mesh position={[0, 0, 5]}>
+      <boxGeometry args={[0.5, 0.5, 0.5]} />
+      <meshStandardMaterial wireframe />
+    </mesh>
+  )
+}
+
+
 const Scene: React.FC = ({}) => {
   Refs.camera = useRef<THREE.Camera>(null!);
   useFrame(() => {
@@ -70,6 +80,7 @@ const Scene: React.FC = ({}) => {
       />
       <Stars radius={1000} depth={75} count={50_000} fade/>
       <Ship />
+      <Target />
     </>
   )
 }
