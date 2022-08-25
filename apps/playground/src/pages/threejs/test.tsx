@@ -178,6 +178,6 @@ function updateShipMovement(delta: number, inputs: InputController) {
   const MAX_YAW = degToRad(5);
   ship.translateZ(fwd.current * delta);
   ship.translateX(strafe.current * delta);
-  ship.rotation.y += (Math.PI / 365 /2) * inputs.turn;
+  ship.rotateY((Math.PI / 365 /2) * inputs.turn);
   Refs.mesh.current.rotation.z = -MAX_YAW * (strafe.current / strafe.max);
 }
