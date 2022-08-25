@@ -1,4 +1,5 @@
 import { Title, Text, Anchor } from '@mantine/core';
+import { APP_NAME } from 'config/core/common';
 import useStyles from './Welcome.styles';
 
 interface WelcomeProps {
@@ -11,7 +12,7 @@ const DefaultTitle = () => (
   <>
   Welcome to{' '}
   <Text inherit variant="gradient" component="span">
-    Mantine
+    {APP_NAME}
   </Text>
   </>
 );

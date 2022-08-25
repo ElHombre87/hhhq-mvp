@@ -1,9 +1,7 @@
 /* eslint-disable max-len */
 import _ from 'lodash';
-import type { MantineThemeOverride } from '@mantine/styles/lib/theme/types/MantineTheme';
-
 import common, { CustomColor } from 'config/core/theme/base.theme';
-import { ColorIndex, MantineTheme, OtherColor, ThemeColor } from '@mantine/core';
+import {  MantineThemeOverride, ColorIndex, MantineTheme, OtherColor, ThemeColor } from '@mantine/core';
 
 function hasColor(theme: MantineThemeOverride, color: ThemeColor): boolean {
   // return _.has(theme, color);

@@ -6,6 +6,7 @@ import { Text, Header, Group, MediaQuery, Burger } from '@mantine/core';
 import { useLayoutContext } from 'contexts/Layout.context';
 
 import useStyles from './Header.styles';
+import * as CONFIG from 'config/core/common'
 
 export interface MainHeaderProps {}
 
@@ -23,7 +24,7 @@ export const MainHeader: React.FC<MainHeaderProps> = () => {
             <Burger size="sm" opened={navbar.isOpen} onClick={navbar.toggle} />
           </MediaQuery>
           <Text variant="text" component="h4">
-            App title / Sub app
+            {CONFIG.APP_NAME}
           </Text>
         </Group>
         <Group position="apart">
