@@ -101,7 +101,6 @@ const ShipComponent: React.FC = () => {
     <>
     <group ref={ship} scale={0.1} onClick={() => setMouseActive(s => !s)}>
       <Player ref={meshRef}/>
-q
     </group>
     <axesHelper ref={axesRef}/>
     <Trail
