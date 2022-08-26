@@ -114,8 +114,25 @@ const ShipComponent: React.FC = () => {
 }
 
 const Target: React.FC = () => {
+  const ref = useRef<THREE.Mesh>(null!);
+  const [inRange, setInRange] = useState<boolean>(false);
+  useFrame(() => {
+    if (!Refs.ship) return;
+    setInRange(ref.current.position.distanceTo(Refs.ship.current.position) < 0.5);
+  })
+  useEffect(() => {
+    if (inRange) {
+      showNotification({
+        color: 'green',
+        title: 'Target Reached!',
+        message: 'You reached your destination',
+        id: '3d__target-status',
+        autoClose: 2000,
+      });
+    }
+  }, [inRange])
   return (
-    <mesh position={[0, 0, 5]}>
+    <mesh ref={ref} position={[0, 0, 5]}>
       <boxGeometry args={[0.5, 0.5, 0.5]} />
       <meshStandardMaterial wireframe />
     </mesh>
