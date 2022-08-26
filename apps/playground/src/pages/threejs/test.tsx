@@ -53,6 +53,7 @@ const ShipComponent: React.FC = () => {
     <>
     <group ref={ship} scale={0.1}>
       <Player ref={meshRef}/>
+      <axesHelper position={[ship.current.position.x, ship.current.position.y, ship.current.position.z]}/>
     </group>
     <Trail
       width={1} // Width of the line
