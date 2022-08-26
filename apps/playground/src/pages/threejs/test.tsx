@@ -32,28 +32,26 @@ const shipState = new Speeds(
 
 const inputController = new InputController(CONTROLS);
 
+interface RotConfig { max: number, rate: number, input: number, current: number, limit?: boolean}
 function updateRotations(values: RotConfig) {
-  const { max, rate, amount, current, limit } = values;
-  const deadzone = 0.25;
+  const { max, rate, input: amount, current, limit } = values;
+  const deadzone = 0.05;
     let newValue = current + (amount * rate)
-    newValue = isNearly(amount, 0, deadzone) ? current : lerp(current, newValue, .1)
+    newValue = isNearly(amount, 0, deadzone) ? current : lerp(current, newValue, .1);
+    // if (Math.abs(newValue) >= degToRad(89.9)) newValue *= -1;
     return limit ? clamp(newValue, -max, max) : newValue;
 }
 
 function updateMouseInputs(target: THREE.Object3D, pitch: RotConfig, yaw: RotConfig) {
-  target.rotation.x = updateRotations({
-    limit: true,
-    max: pitch.max,
-    rate: pitch.rate,
-    amount: pitch.amount,
-    current: target.rotation.x,
-  });
-  target.rotation.y = updateRotations({
-    max: yaw.max,
-    rate: yaw.rate,
-    amount: yaw.amount,
-    current: target.rotation.y
-  });
+  // const newRot = new THREE.Matrix4()
+  const newRot_x = updateRotations({...pitch, current: target.rotation.x, limit: true });
+  const newRot_y = updateRotations({...yaw, current: target.rotation.y });
+  target.rotateOnAxis(new THREE.Vector3(1,0,0), newRot_x - target.rotation.x)
+  target.rotateOnAxis(new THREE.Vector3(0,1,0), newRot_y - target.rotation.y)
+  // target.rotation.x = newRot_x;
+  // // target.rotateY(yaw.input * yaw.rate);
+  // target.rotation.y = newRot_y;
+
 }
 
 const ShipComponent: React.FC = () => {
@@ -66,24 +64,23 @@ const ShipComponent: React.FC = () => {
     Refs.mesh = meshRef;
   }, [ship])
   const inputs = useRef(inputController);
-  const [mouseActive, setMouseActive] = useState(true);
+  const [mouseRotation, setMouseRotation] = useState(true);
   /** hooks proxy to mantine useWindowEvent to bind keydown/up */
-  useHandleKeyboardInputs(inputs.current);
+  useHandleKeyboardInputs(inputs.current, setMouseRotation);
+  const MAX_PITCH = degToRad(45);
+  const MAX_YAW = degToRad(180);
+  const ROTATION_RATE = .1;
   useFrame(({mouse}, delta) => {
     if (!ship.current) return;
     const _ship = ship.current;
     updateShipMovement(delta, inputs.current);
-    const MAX_PITCH = degToRad(45);
-    const MAX_YAW = degToRad(90);
-    const ROTATION_RATE = .1;
-    if (mouseActive)
+    if (mouseRotation)
       updateMouseInputs(_ship, {
-        limit: true,
-        amount: -mouse.y,
+        limit: true, input: -mouse.y,
         max: MAX_PITCH, rate: ROTATION_RATE,
         current: _ship.rotation.x,
       }, {
-        amount: -mouse.x,
+        input: -mouse.x,
         max: MAX_YAW, rate: ROTATION_RATE,
         current: _ship.rotation.y
       });
@@ -94,7 +91,7 @@ const ShipComponent: React.FC = () => {
   const Player = useShip();
   return (
     <>
-    <group ref={ship} scale={0.1} onClick={() => setMouseActive(s => !s)}>
+    <group ref={ship} scale={0.1}>
       <Player ref={meshRef}/>
     </group>
     <axesHelper ref={axesRef}/>
@@ -218,7 +215,7 @@ function updateFollowCamera(camera: THREE.Camera, target: THREE.Group) {
  * binds the InputController (and optionally other inputs) to the dom events
  * through built-in mantine hooks
  */
-function useHandleKeyboardInputs(inputs: InputController) {
+function useHandleKeyboardInputs(inputs: InputController, setMouseRotation: React.Dispatch<React.SetStateAction<boolean>>) {
   
   useWindowEvent('keydown', inputs.updateKeys);
   useWindowEvent('keyup', inputs.updateKeys);
@@ -228,7 +225,11 @@ function useHandleKeyboardInputs(inputs: InputController) {
       case 'KeyZ':
         Refs.ship!.current.position.set(0,0,0);
         Refs.ship!.current.rotation.set(0,0,0);
+        shipState.fwd.current = 0;
+        shipState.strafe.current = 0;
         break;
+      case 'KeyY':
+        setMouseRotation(s => !s); break;
       default: return;
     }
   });
@@ -248,6 +249,8 @@ function updateShipMovement(delta: number, inputs: InputController) {
   // mesh.position.set(ship.position.x, ship.position.y, ship.position.z);
   // mesh.rotation.set(ship.rotation.x, ship.rotation.y, ship.rotation.z);
   // ship.rotateY((Math.PI / 365 /2) * inputs.turn);
+  ship.rotateZ((degToRad(.5)) * -inputs.roll);
+
   // Refs.mesh.current.rotation.z = -MAX_YAW * (strafe.current / strafe.max);
 }
 
