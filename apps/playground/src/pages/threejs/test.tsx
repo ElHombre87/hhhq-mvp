@@ -179,7 +179,7 @@ const useCanvasColor = (theme?: MantineTheme) => {
 /** updates the active camera transform to follow the 'player' */
 function updateFollowCamera(camera: THREE.Camera, target: THREE.Group) {
   if (!camera || !target) return;
-  var relativeCameraOffset = new THREE.Vector3(0,12,-15);
+  var relativeCameraOffset = new THREE.Vector3(0,5,lerp(-8, -12, clamp(shipState.fwd.current / shipState.fwd.max, 0, 1)));
   var offset = relativeCameraOffset.applyMatrix4(target.matrixWorld);
   camera.position.set(offset.x, offset.y, offset.z)
   camera.lookAt(target.position);
