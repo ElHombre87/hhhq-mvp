@@ -43,8 +43,7 @@ const ShipComponent: React.FC = () => {
     turnRight: 'KeyE',
   }));
 
-  useHandleInputs(inputs.current);
-  useFrame((_, delta) => {
+  useHandleKeyboardInputs(inputs.current);
     if (!ship.current) return;
     updateShipMovement(delta, inputs.current);
   })
@@ -151,10 +150,10 @@ function updateFollowCamera(camera: THREE.Camera, target: THREE.Group) {
  * binds the InputController (and optionally other inputs) to the dom events
  * through built-in mantine hooks
  */
-function useHandleInputs(inputs: InputController) {
+function useHandleKeyboardInputs(inputs: InputController) {
   
-  useWindowEvent('keydown', inputs.update);
-  useWindowEvent('keyup', inputs.update);
+  useWindowEvent('keydown', inputs.updateKeys);
+  useWindowEvent('keyup', inputs.updateKeys);
 
   useWindowEvent('keydown', ({code}) => {
     switch(code) {
