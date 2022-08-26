@@ -18,7 +18,7 @@ export class Velocity {
     this.current = Velocity._compute(this, direction) + Velocity._break(this, breaking);
     return this.current;
   }
-
+  
   private static _compute(self: Velocity, direction: Direction) {
     return clamp(self.current + (self.acceleration * direction), -self.max, self.max)
   }
@@ -77,3 +77,39 @@ export class InputController {
   }
 
 }
+
+
+/**
+ *   
+  let rotationMatrix = new THREE.Matrix4();
+  let rotWorldMatrix = new THREE.Matrix4();
+
+  const AxisX = new THREE.Vector3(1, 0, 0);
+  const AxisY = new THREE.Vector3(0, 1, 0);
+
+  function rotateAroundObjectAxis(object: THREE.Object3D, axis: THREE.Vector3, radians: number) {
+    rotationMatrix = new THREE.Matrix4();
+    rotationMatrix.makeRotationAxis(axis.normalize(), radians);
+    object.matrix.multiply(rotationMatrix);                       // post-multiply
+    object.rotation.setFromRotationMatrix(object.matrix, object.rotation.order);
+  }
+  function rotateAroundWorldAxis(object: THREE.Object3D, axis: THREE.Vector3, radians: number) {
+    rotWorldMatrix = new THREE.Matrix4();
+    rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
+    rotWorldMatrix.multiply(object.matrix);        // pre-multiply
+    object.matrix = rotWorldMatrix;
+    object.rotation.setFromRotationMatrix(object.matrix, object.rotation.order);
+  }
+  function derp(object: THREE.Object3D, axis: THREE.Vector3, radians: number) {
+    let invWorldRot = object.getWorldQuaternion(new THREE.Quaternion()).invert();
+    axis.applyQuaternion(invWorldRot);
+
+    let deltaLocalRot = new THREE.Quaternion();
+    deltaLocalRot.setFromAxisAngle(axis, radians);
+    object.quaternion.multiply(deltaLocalRot);
+  }
+  target.updateWorldMatrix(true, true);
+  // rotateAroundObjectAxis(target, AxisY, yaw.input);
+  // derp(target, AxisX, clamp(pitch.input / 100, -pitch.max, pitch.max));
+  rotateAroundObjectAxis(target, AxisY, clamp(degToRad(180*-yaw.input), -yaw.max, yaw.max));
+ */
