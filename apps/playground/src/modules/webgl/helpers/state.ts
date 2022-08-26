@@ -46,18 +46,15 @@ export class Speeds {
 export class InputController {
   public fwd: Direction = 0;
   public strafe: Direction = 0;
-  public turn: Direction = 0;
+  public roll: Direction = 0;
   public break: boolean = false;
   public multiplier: number = 1;
 
   public pitch: number = 0;
 
-  private inputs: InputConfig<string[]>;
+  // private inputs: InputConfig;
   
-  constructor(_inputs: InputConfig<string|string[]>) {
-    this.inputs = Object.entries(_inputs).reduce(
-      (p, [k, v]) => ({...p, [k]: Array.isArray(v) ? v : [v]}),
-      {} as InputConfig<string[]>);
+  constructor(private inputs: InputConfig) {
   }
   
   updateKeys = (event: KeyboardEvent) => {
@@ -67,8 +64,8 @@ export class InputController {
     this.strafe = InputController.evaluate(this.inputs.right, this.strafe, event, -1, 0);
     this.break = InputController.evaluate(this.inputs.break, this.break, event, true, false);
 
-    this.turn = InputController.evaluate(this.inputs.turnRight, this.turn, event, -1, 0);
-    this.turn = InputController.evaluate(this.inputs.turnLeft, this.turn, event, 1, 0);
+    this.roll = InputController.evaluate(this.inputs.rollRight, this.roll, event, -1, 0);
+    this.roll = InputController.evaluate(this.inputs.rollLeft, this.roll, event, 1, 0);
 
     this.multiplier = InputController.evaluate(this.inputs.boost, this.multiplier, event, 2, 1);
   }

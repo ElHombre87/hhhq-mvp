@@ -26,17 +26,8 @@ const shipState = new Speeds(
   new Velocity(2.5, 5/100),
 );
 
-const inputController = new InputController({
-    fwd: ['KeyW', 'ArrowUp'],
-    left: ['KeyA', 'ArrowLeft'],
-    back: ['KeyS', 'ArrowDown'],
-    right: ['KeyD', 'ArrowRight'],
-    boost: 'ShiftLeft',
-    break: 'Space',
-    turnLeft: 'KeyQ',
-    turnRight: 'KeyE',
-});
-interface RotConfig { max: number, rate: number, amount: number, current: number, limit?: boolean}
+const inputController = new InputController(CONTROLS);
+
 function updateRotations(values: RotConfig) {
   const { max, rate, amount, current, limit } = values;
   const deadzone = 0.25;

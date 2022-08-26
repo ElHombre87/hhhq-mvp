@@ -15,13 +15,13 @@ export interface Movements {
   break: boolean
 }
 
-export interface InputConfig<T extends string|string[] = string> {
-  fwd: T;
-  back: T;
-  left: T;
-  right: T;
-  boost: T;
-  break: T;
-  turnLeft: T;
-  turnRight: T;
+export type InputConfig = {
+  fwd: string[];
+  back: string[];
+  left: string[];
+  right: string[];
+  boost: string[];
+  break: string[];
+  rollLeft: string[];
+  rollRight: string[];
 }
