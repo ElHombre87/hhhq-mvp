@@ -30,12 +30,12 @@ interface ShipProps {
   colors?: {primary?: string, secondary?: string}
 }
 
-const defaultColors: ShipProps['colors'] = {primary: 'teal', secondary: 'white'}
+const defaultColors: ShipProps['colors'] = {primary: '#3a3a3a', secondary: 'white'}
 // One-click copy/paste from the poimandres market: https://market.pmnd.rs/model/low-poly-spaceship
 export const Ship = forwardRef<THREE.Group, ShipProps>((props, ref) => {
   const { nodes, materials } = useGLTF('https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/low-poly-spaceship/model.gltf') as GLTFResult;
   const theme =  useMantineTheme()
-  const colors = {...defaultColors, ...props?.colors}
+  const colors = {...defaultColors, primary: theme.colors.orange[9], ...props?.colors}
   useLayoutEffect(() => {
     Object.values(materials).forEach((material) => {
       material.roughness = 0.75
