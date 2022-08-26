@@ -12,6 +12,10 @@ import { clamp, degToRad, lerp } from "three/src/math/MathUtils";
 import { Ship } from "modules/webgl/assets/ship";
 import { isNearly } from "utils/math";
 import { AxesHelper } from "three";
+import { showNotification } from "@mantine/notifications";
+import { CONTROLS } from "modules/webgl/config/inputs";
+import { openModal } from "@mantine/modals";
+import { ShipControlsModal } from "modules/webgl/components/Controls.modal";
 
 
 const Refs = new (class RefsContainer {
@@ -156,10 +160,16 @@ export default function WebGLTestPage() {
       <Canvas
         ref={canvas}
         shadows
-        style={{width: '100%', height: '100vh'}}
-        // onCreated={({gl}) => gl.setClearColor(color)}
+        style={{width: '100%', height: '100%',}}
+        onCreated={({gl}) => {
+          gl.setClearColor(color);
+          openModal({
+            title: 'Controls',
+            children: <ShipControlsModal />
+          });
+        }}
       >
-        <gridHelper />
+        <gridHelper position={[0, -1, 0]} />
         <FlyControls movementSpeed={1} />
         <OrbitControls />
         <Scene />
