@@ -11,6 +11,7 @@ import { InputController, Speeds, Velocity } from "modules/webgl/helpers/state";
 import { clamp, degToRad, lerp } from "three/src/math/MathUtils";
 import { Ship } from "modules/webgl/assets/ship";
 import { isNearly } from "utils/math";
+import { AxesHelper } from "three";
 
 
 const Refs = new (class RefsContainer {
@@ -63,6 +64,8 @@ function updateMouseInputs(target: THREE.Object3D, pitch: RotConfig, yaw: RotCon
 const ShipComponent: React.FC = () => {
   const ship = useRef<THREE.Group>(null!)
   const meshRef= useRef<THREE.Group>(null!);
+  const axesRef= useRef<AxesHelper>(null!);
+
   useEffect(() => {
     Refs.ship = ship;
     Refs.mesh = meshRef;
@@ -73,21 +76,24 @@ const ShipComponent: React.FC = () => {
   useHandleKeyboardInputs(inputs.current);
   useFrame(({mouse}, delta) => {
     if (!ship.current) return;
+    const _ship = ship.current;
     updateShipMovement(delta, inputs.current);
     const MAX_PITCH = degToRad(45);
     const MAX_YAW = degToRad(90);
     const ROTATION_RATE = .1;
     if (mouseActive)
-      updateMouseInputs(ship.current, {
+      updateMouseInputs(_ship, {
         limit: true,
         amount: -mouse.y,
         max: MAX_PITCH, rate: ROTATION_RATE,
-        current: ship.current.rotation.x,
+        current: _ship.rotation.x,
       }, {
         amount: -mouse.x,
         max: MAX_YAW, rate: ROTATION_RATE,
-        current: ship.current.rotation.y
-      })
+        current: _ship.rotation.y
+      });
+      axesRef.current.position.set(_ship.position.x, _ship.position.y, _ship.position.z)
+      axesRef.current.rotation.set(_ship.rotation.x, _ship.rotation.y, _ship.rotation.z)
   })
 
   const Player = useShip();
@@ -95,8 +101,9 @@ const ShipComponent: React.FC = () => {
     <>
     <group ref={ship} scale={0.1} onClick={() => setMouseActive(s => !s)}>
       <Player ref={meshRef}/>
-      <axesHelper position={[ship.current.position.x, ship.current.position.y, ship.current.position.z]}/>
+q
     </group>
+    <axesHelper ref={axesRef}/>
     <Trail
       width={1} // Width of the line
       color={'#F8D628'} // Color of the line
