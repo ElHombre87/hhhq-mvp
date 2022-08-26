@@ -163,8 +163,13 @@ export default function WebGLTestPage() {
 
   return (
     <Suspense fallback={null}>
-      <Canvas ref={canvas} shadows style={{width: '100%', height: '100vh'}} onCreated={({gl}) => gl.setClearColor(color)}>
-        {/* <gridHelper /> */}
+      <Canvas
+        ref={canvas}
+        shadows
+        style={{width: '100%', height: '100vh'}}
+        // onCreated={({gl}) => gl.setClearColor(color)}
+      >
+        <gridHelper />
         <FlyControls movementSpeed={1} />
         <OrbitControls />
         <Scene />
@@ -220,9 +225,14 @@ function updateShipMovement(delta: number, inputs: InputController) {
 
   shipState.update(inputs);
   const { fwd, strafe } = shipState;
-  const MAX_YAW = degToRad(5);
+  const MAX_YAW = degToRad(15);
   ship.translateZ(fwd.current * delta);
   ship.translateX(strafe.current * delta);
+  // mesh.position.set(ship.position.x, ship.position.y, ship.position.z);
+  // mesh.rotation.set(ship.rotation.x, ship.rotation.y, ship.rotation.z);
+  // ship.rotateY((Math.PI / 365 /2) * inputs.turn);
+  // Refs.mesh.current.rotation.z = -MAX_YAW * (strafe.current / strafe.max);
+}
 
 
 const useShip = () => {
