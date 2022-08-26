@@ -1,15 +1,17 @@
 import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber'
-import { FlyControls, OrbitControls, PerspectiveCamera, Stars, Trail } from "@react-three/drei";
+import { FlyControls, OrbitControls, PerspectiveCamera, Sparkles, Stars, Trail } from "@react-three/drei";
 import { MantineTheme, useMantineTheme } from "@mantine/core";
 import { isDarkTheme } from "utils/theme.utils";
 
 import { useWindowEvent } from "@mantine/hooks";
 import { Viper } from "modules/webgl/assets/viper";
 import { InputController, Speeds, Velocity } from "modules/webgl/helpers/state";
-import { degToRad } from "three/src/math/MathUtils";
+import { clamp, degToRad, lerp } from "three/src/math/MathUtils";
 import { Ship } from "modules/webgl/assets/ship";
+import { isNearly } from "utils/math";
+
 
 const Refs = new (class RefsContainer {
   ship: React.MutableRefObject<THREE.Group> = null!;
@@ -19,20 +21,11 @@ const Refs = new (class RefsContainer {
 })
 
 const shipState = new Speeds(
-  // new Velocity(0.05),
-  // new Velocity(0.025, 0.05/100, 2),
   new Velocity(5, 5/100, .5),
   new Velocity(2.5, 5/100),
 );
 
-const ShipComponent: React.FC = () => {
-  const ship = useRef<THREE.Group>(null!)
-  const meshRef= useRef<THREE.Group>(null!);
-  useEffect(() => {
-    Refs.ship = ship;
-    Refs.mesh = meshRef;
-  }, [ship])
-  const inputs = useRef(new InputController({
+const inputController = new InputController({
     fwd: ['KeyW', 'ArrowUp'],
     left: ['KeyA', 'ArrowLeft'],
     back: ['KeyS', 'ArrowDown'],
@@ -41,17 +34,66 @@ const ShipComponent: React.FC = () => {
     break: 'Space',
     turnLeft: 'KeyQ',
     turnRight: 'KeyE',
-  }));
+});
+interface RotConfig { max: number, rate: number, amount: number, current: number, limit?: boolean}
+function updateRotations(values: RotConfig) {
+  const { max, rate, amount, current, limit } = values;
+  const deadzone = 0.25;
+    let newValue = current + (amount * rate)
+    newValue = isNearly(amount, 0, deadzone) ? current : lerp(current, newValue, .1)
+    return limit ? clamp(newValue, -max, max) : newValue;
+}
 
+function updateMouseInputs(target: THREE.Object3D, pitch: RotConfig, yaw: RotConfig) {
+  target.rotation.x = updateRotations({
+    limit: true,
+    max: pitch.max,
+    rate: pitch.rate,
+    amount: pitch.amount,
+    current: target.rotation.x,
+  });
+  target.rotation.y = updateRotations({
+    max: yaw.max,
+    rate: yaw.rate,
+    amount: yaw.amount,
+    current: target.rotation.y
+  });
+}
+
+const ShipComponent: React.FC = () => {
+  const ship = useRef<THREE.Group>(null!)
+  const meshRef= useRef<THREE.Group>(null!);
+  useEffect(() => {
+    Refs.ship = ship;
+    Refs.mesh = meshRef;
+  }, [ship])
+  const inputs = useRef(inputController);
+  const [mouseActive, setMouseActive] = useState(true);
+  /** hooks proxy to mantine useWindowEvent to bind keydown/up */
   useHandleKeyboardInputs(inputs.current);
+  useFrame(({mouse}, delta) => {
     if (!ship.current) return;
     updateShipMovement(delta, inputs.current);
+    const MAX_PITCH = degToRad(45);
+    const MAX_YAW = degToRad(90);
+    const ROTATION_RATE = .1;
+    if (mouseActive)
+      updateMouseInputs(ship.current, {
+        limit: true,
+        amount: -mouse.y,
+        max: MAX_PITCH, rate: ROTATION_RATE,
+        current: ship.current.rotation.x,
+      }, {
+        amount: -mouse.x,
+        max: MAX_YAW, rate: ROTATION_RATE,
+        current: ship.current.rotation.y
+      })
   })
 
   const Player = useShip();
   return (
     <>
-    <group ref={ship} scale={0.1}>
+    <group ref={ship} scale={0.1} onClick={() => setMouseActive(s => !s)}>
       <Player ref={meshRef}/>
       <axesHelper position={[ship.current.position.x, ship.current.position.y, ship.current.position.z]}/>
     </group>
