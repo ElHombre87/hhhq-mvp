@@ -16,6 +16,7 @@ import { showNotification } from "@mantine/notifications";
 import { CONTROLS } from "modules/webgl/config/inputs";
 import { openModal } from "@mantine/modals";
 import { ShipControlsModal } from "modules/webgl/components/Controls.modal";
+import PageLayout from "layouts/PageLayout";
 
 
 const Refs = new (class RefsContainer {
@@ -170,6 +171,7 @@ export default function WebGLTestPage() {
   const { color } = useCanvasColor();
 
   return (
+    <PageLayout pt={0} withContainer={false} sx={{body: { height: '100%', width: '100%', position: 'absolute'}}}>
     <Suspense fallback={null}>
       <Canvas
         ref={canvas}
@@ -189,6 +191,7 @@ export default function WebGLTestPage() {
         <Scene />
       </Canvas>
     </Suspense>
+    </PageLayout>
   )
 };
 
