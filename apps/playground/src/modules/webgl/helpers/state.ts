@@ -4,8 +4,9 @@
  */
 
 import { isNearly } from "utils/math"
-import { clamp, degToRad } from "three/src/math/MathUtils";
-import { Movements, Direction, InputConfig } from "../types";
+import { clamp } from "three/src/math/MathUtils";
+import { Movements, InputConfig } from "../types";
+import { Vector3, Euler } from 'three';
 
 export class Velocity {
   public current = 0;
@@ -14,12 +15,12 @@ export class Velocity {
     public acceleration = max / 100,
     public breakingFactor = 1,
   ) {}
-  compute(direction: Direction, breaking: boolean) {
+  compute(direction: number, breaking: boolean) {
     this.current = Velocity._compute(this, direction) + Velocity._break(this, breaking);
     return this.current;
   }
   
-  private static _compute(self: Velocity, direction: Direction) {
+  private static _compute(self: Velocity, direction: number) {
     return clamp(self.current + (self.acceleration * direction), -self.max, self.max)
   }
   private static _break(self: Velocity, breaking: boolean) {
@@ -33,51 +34,59 @@ export class Speeds {
   constructor(
     public fwd: Velocity,
     public strafe: Velocity,
+    public vertical: Velocity,
     // public pitch: number,
   ) {}
   update(moves: Movements) {
-    this.fwd.compute(moves.fwd, moves.break);
-    this.strafe.compute(moves.strafe, moves.break);
+    this.fwd.compute(moves.translation.z, moves.break);
+    this.strafe.compute(moves.translation.x, moves.break);
+    this.vertical.compute(moves.translation.y, moves.break);
     return this;
   }
 }
 
 
-export class InputController {
-  public fwd: Direction = 0;
-  public strafe: Direction = 0;
-  public roll: Direction = 0;
+export class InputController implements Movements {
+  public translation = new Vector3();
+  public rotation = new Euler();
+
+  public roll: number = 0;
   public break: boolean = false;
   public multiplier: number = 1;
 
   public pitch: number = 0;
 
-  // private inputs: InputConfig;
-  
   constructor(private inputs: InputConfig) {
   }
   
   updateKeys = (event: KeyboardEvent) => {
-    this.fwd = InputController.evaluate(this.inputs.fwd, this.fwd, event, 1, 0);
-    this.fwd = InputController.evaluate(this.inputs.back, this.fwd, event, -1, 0);
-    this.strafe = InputController.evaluate(this.inputs.left, this.strafe, event, 1, 0);
-    this.strafe = InputController.evaluate(this.inputs.right, this.strafe, event, -1, 0);
-    this.break = InputController.evaluate(this.inputs.break, this.break, event, true, false);
+    this.translation.set(
+      InputController.evaluateAxis(this.translation.x, event, [this.inputs.left, 1], [this.inputs.right, -1]),
+      InputController.evaluateAxis(this.translation.y, event, [this.inputs.up, 1], [this.inputs.down, -1]),
+      InputController.evaluateAxis(this.translation.z, event, [this.inputs.fwd, 1], [this.inputs.back, -1]),
+    )
 
-    this.roll = InputController.evaluate(this.inputs.rollRight, this.roll, event, -1, 0);
-    this.roll = InputController.evaluate(this.inputs.rollLeft, this.roll, event, 1, 0);
+    this.break = InputController._evaluate(this.inputs.break, this.break, event, true, false);
 
-    this.multiplier = InputController.evaluate(this.inputs.boost, this.multiplier, event, 2, 1);
+    this.roll = InputController._evaluate(this.inputs.rollRight, this.roll, event, -1, 0);
+    this.roll = InputController._evaluate(this.inputs.rollLeft, this.roll, event, 1, 0);
+
+    this.multiplier = InputController._evaluate(this.inputs.boost, this.multiplier, event, 2, 1);
   }
 
-  static evaluate<T>(keys: string[], current: T, event: KeyboardEvent, keydown: T, keyup: T): T {
+  private static _evaluate<T>(keys: string[], current: T, event: KeyboardEvent, keydown: T, keyup: T): T {
     const { code, type } = event;
     if (!keys.includes(code)) return current;
     return type === 'keydown' ? keydown : keyup
   }
 
-}
+  private static evaluateAxis = (current: number, event: KeyboardEvent, ...config: [keys: string[], press: number, release?:number][]) => {
+    // if any of the provided key mapping didn't change return the current value (allows for multiple active axes)
+    if (!config.find(([keys]) => keys.includes(event.code))) return current;
 
+    return config.reduce((prev, [keys, press, release]) => InputController._evaluate(keys, prev, event, press, release ?? 0), 0)
+  }
+}
 
 /**
  *   

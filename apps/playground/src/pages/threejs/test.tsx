@@ -28,6 +28,7 @@ const Refs = new (class RefsContainer {
 const shipState = new Speeds(
   new Velocity(5, 5/100, .5),
   new Velocity(2.5, 5/100),
+  new Velocity(2.5, 5/100),
 );
 
 const inputController = new InputController(CONTROLS);
@@ -244,10 +245,11 @@ function updateShipMovement(delta: number, inputs: InputController) {
   if (!ship || !mesh) return;
 
   shipState.update(inputs);
-  const { fwd, strafe } = shipState;
+  const { fwd, strafe, vertical } = shipState;
   const MAX_YAW = degToRad(15);
   ship.translateZ(fwd.current * delta);
   ship.translateX(strafe.current * delta);
+  ship.translateY(vertical.current * delta);
   // mesh.position.set(ship.position.x, ship.position.y, ship.position.z);
   // mesh.rotation.set(ship.rotation.x, ship.rotation.y, ship.rotation.z);
   // ship.rotateY((Math.PI / 365 /2) * inputs.turn);

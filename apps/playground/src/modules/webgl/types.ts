@@ -1,16 +1,8 @@
-
-/**
- * Direction of movement on an Axis.
- * 1  - forward (camera/mesh relative)
- * 0  - stopped
- * -1 - backward (camera/mesh relative)
- */
-export type Direction = 1 | 0 | -1;
+import { Vector3 } from "three";
 
 /** Available movement options for the player */
 export interface Movements {
-  fwd: Direction
-  strafe: Direction
+  translation: Vector3;
   multiplier: number
   break: boolean
 }
@@ -20,6 +12,8 @@ export type InputConfig = {
   back: string[];
   left: string[];
   right: string[];
+  up: string[];
+  down: string[];
   boost: string[];
   break: string[];
   rollLeft: string[];
