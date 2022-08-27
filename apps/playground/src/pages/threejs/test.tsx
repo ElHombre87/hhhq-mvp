@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { FlyControls, OrbitControls, PerspectiveCamera, Stars, Trail } from "@react-three/drei";
+import { FlyControls, OrbitControls, PerspectiveCamera, Sphere, Stars, Trail } from "@react-three/drei";
 import { Canvas, useFrame } from '@react-three/fiber';
 import { clamp, degToRad, lerp } from "three/src/math/MathUtils";
 import * as THREE from 'three';
@@ -92,8 +92,9 @@ const ShipComponent: React.FC = () => {
   const Player = useShip();
   return (
     <>
-    <group ref={ship} scale={0.1}>
+    <group ref={ship} scale={0.1} name="ship">
       <Player ref={meshRef}/>
+      {/* <Camera /> */}
     </group>
     <axesHelper ref={axesRef}/>
     <Trail
@@ -110,6 +111,14 @@ const ShipComponent: React.FC = () => {
     </>
   )
 }
+
+const Camera: React.FC = () => {
+  Refs.camera = useRef<THREE.Camera>(null!);
+  return (
+    <PerspectiveCamera ref={Refs.camera} makeDefault fov={70} near={0.1} far={50000} name="main-camera" />
+  )
+}
+
 
 const Target: React.FC = () => {
   const ref = useRef<THREE.Mesh>(null!);
@@ -130,7 +139,7 @@ const Target: React.FC = () => {
     }
   }, [inRange])
   return (
-    <mesh ref={ref} position={[0, 0, 5]}>
+    <mesh ref={ref} position={[0, 0, 5]} name="demo__target-cube">
       <boxGeometry args={[0.5, 0.5, 0.5]} />
       <meshStandardMaterial wireframe />
     </mesh>
@@ -138,7 +147,6 @@ const Target: React.FC = () => {
 }
 
 const Scene: React.FC = ({}) => {
-  Refs.camera = useRef<THREE.Camera>(null!);
   useFrame(() => {
     updateFollowCamera(Refs.camera?.current, Refs.ship?.current);
   });
@@ -147,19 +155,14 @@ const Scene: React.FC = ({}) => {
     <>
       <ambientLight intensity={0.2} />
       <pointLight intensity={1.0} position={[10, 10, 10]} />
-      
-      <PerspectiveCamera
-        makeDefault
-        ref={Refs.camera}
-        // position={[0, 0, 0]}
-        // rotation={[0, 0, 0]}
-        fov={90}
-        near={0.1}
-        far={5000}
-      />
-      <Stars radius={1000} depth={75} count={50_000} fade/>
+      <Camera />
+      <Stars radius={500} depth={500} count={50_000}/>
       {/* <Sparkles rotation={[0,0,Math.PI/4]} size={.75} count={10000} opacity={0.5} noise={1} speed={0.025} scale={50} /> */}
-     
+      {/* World Center */}
+      <Sphere position={[0,0,0]} args={[.05, 12, 12]}>
+        <meshBasicMaterial color="hotpink" wireframe/>
+      </Sphere>
+      <axesHelper position={[0,0,0]} />
       <ShipComponent />
       <Target />
     </>
