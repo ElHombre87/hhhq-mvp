@@ -1,23 +1,22 @@
 import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import * as THREE from 'three';
-import { Canvas, useFrame } from '@react-three/fiber'
-import { FlyControls, OrbitControls, PerspectiveCamera, Sparkles, Stars, Trail } from "@react-three/drei";
-import { MantineTheme, useMantineTheme } from "@mantine/core";
-import { isDarkTheme } from "utils/theme.utils";
-
-import { useWindowEvent } from "@mantine/hooks";
-import { Viper } from "modules/webgl/assets/viper";
-import { InputController, Speeds, Velocity } from "modules/webgl/helpers/state";
+import { FlyControls, OrbitControls, PerspectiveCamera, Stars, Trail } from "@react-three/drei";
+import { Canvas, useFrame } from '@react-three/fiber';
 import { clamp, degToRad, lerp } from "three/src/math/MathUtils";
-import { Ship } from "modules/webgl/assets/ship";
-import { isNearly } from "utils/math";
-import { AxesHelper } from "three";
-import { showNotification } from "@mantine/notifications";
-import { CONTROLS } from "modules/webgl/config/inputs";
-import { openModal } from "@mantine/modals";
-import { ShipControlsModal } from "modules/webgl/components/Controls.modal";
-import PageLayout from "layouts/PageLayout";
+import * as THREE from 'three';
 
+import { MantineTheme, useMantineTheme } from "@mantine/core";
+import { showNotification } from "@mantine/notifications";
+import { useWindowEvent } from "@mantine/hooks";
+import { openModal } from "@mantine/modals";
+
+import PageLayout from "layouts/PageLayout";
+import { isDarkTheme } from "utils/theme.utils";
+import { isNearly } from "utils/math";
+
+import { Ship, Viper } from "modules/webgl/assets";
+import { ShipControlsModal } from "modules/webgl/components";
+import { CONTROLS } from "modules/webgl/config";
+import { InputController, Speeds, Velocity } from "modules/webgl/helpers/state";
 
 const Refs = new (class RefsContainer {
   ship: React.MutableRefObject<THREE.Group> = null!;
@@ -58,7 +57,7 @@ function updateMouseInputs(target: THREE.Object3D, pitch: RotConfig, yaw: RotCon
 const ShipComponent: React.FC = () => {
   const ship = useRef<THREE.Group>(null!)
   const meshRef= useRef<THREE.Group>(null!);
-  const axesRef= useRef<AxesHelper>(null!);
+  const axesRef= useRef<THREE.AxesHelper>(null!);
 
   useEffect(() => {
     Refs.ship = ship;
