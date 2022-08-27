@@ -33,28 +33,6 @@ const shipState = new Speeds(
 
 const inputController = new InputController(CONTROLS);
 
-interface RotConfig { max: number, rate: number, input: number, current: number, limit?: boolean}
-function updateRotations(values: RotConfig) {
-  const { max, rate, input: amount, current, limit } = values;
-  const deadzone = 0.05;
-    let newValue = current + (amount * rate)
-    newValue = isNearly(amount, 0, deadzone) ? current : lerp(current, newValue, .1);
-    // if (Math.abs(newValue) >= degToRad(89.9)) newValue *= -1;
-    return limit ? clamp(newValue, -max, max) : newValue;
-}
-
-function updateMouseInputs(target: THREE.Object3D, pitch: RotConfig, yaw: RotConfig) {
-  // const newRot = new THREE.Matrix4()
-  const newRot_x = updateRotations({...pitch, current: target.rotation.x, limit: true });
-  const newRot_y = updateRotations({...yaw, current: target.rotation.y });
-  target.rotateOnAxis(new THREE.Vector3(1,0,0), newRot_x - target.rotation.x)
-  target.rotateOnAxis(new THREE.Vector3(0,1,0), newRot_y - target.rotation.y)
-  // target.rotation.x = newRot_x;
-  // // target.rotateY(yaw.input * yaw.rate);
-  // target.rotation.y = newRot_y;
-
-}
-
 const ShipComponent: React.FC = () => {
   const ship = useRef<THREE.Group>(null!)
   const meshRef= useRef<THREE.Group>(null!);
@@ -68,23 +46,19 @@ const ShipComponent: React.FC = () => {
   const [mouseRotation, setMouseRotation] = useState(true);
   /** hooks proxy to mantine useWindowEvent to bind keydown/up */
   useHandleKeyboardInputs(inputs.current, setMouseRotation);
-  const MAX_PITCH = degToRad(45);
-  const MAX_YAW = degToRad(180);
-  const ROTATION_RATE = .1;
+  const ROTATION_RATE = 15;
+
   useFrame(({mouse}, delta) => {
     if (!ship.current) return;
     const _ship = ship.current;
     updateShipMovement(delta, inputs.current);
-    if (mouseRotation)
-      updateMouseInputs(_ship, {
-        limit: true, input: -mouse.y,
-        max: MAX_PITCH, rate: ROTATION_RATE,
-        current: _ship.rotation.x,
-      }, {
-        input: -mouse.x,
-        max: MAX_YAW, rate: ROTATION_RATE,
-        current: _ship.rotation.y
-      });
+    function getRotation(input: number, rate: number, deadzone = 0.05) {
+      return isNearly(input, 0, deadzone) ? 0 : input * rate * delta;
+    }
+    if (mouseRotation) {
+      ship.current.rotateX(getRotation(-mouse.y, lerp(0, degToRad(ROTATION_RATE*10), Math.abs(mouse.y)), 0.005));
+      ship.current.rotateY(getRotation(-mouse.x, lerp(0, degToRad(ROTATION_RATE*10), Math.abs(mouse.x)), 0.005));
+    }
       axesRef.current.position.set(_ship.position.x, _ship.position.y, _ship.position.z)
       axesRef.current.rotation.set(_ship.rotation.x, _ship.rotation.y, _ship.rotation.z)
   })
