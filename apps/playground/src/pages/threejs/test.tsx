@@ -231,9 +231,9 @@ function useHandleKeyboardInputs(inputs: InputController, setMouseRotation: Reac
   });
 }
 
-function getRotation(input: number, delta: number, deadzone = 0.05) {
-  const rate = lerp(0, degToRad(ROTATION_RATE), Math.abs(input));
-  return isNearly(input, 0, deadzone) ? 0 : input * rate * delta;
+function getRotation(input: number, rate: number, delta: number, deadzone = 0.05) {
+  const _rate = lerp(0, degToRad(rate), Math.abs(input));
+  return isNearly(input, 0, deadzone) ? 0 : input * _rate * delta;
   
 }
 /** updates ship transform to reflect user inputs */
@@ -247,14 +247,11 @@ function updateShipMovement(inputs: InputController, mouse: THREE.Vector2, delta
   ship.translateZ(fwd.current * delta);
   ship.translateX(strafe.current * delta);
   ship.translateY(vertical.current * delta);
-  // mesh.position.set(ship.position.x, ship.position.y, ship.position.z);
-  // mesh.rotation.set(ship.rotation.x, ship.rotation.y, ship.rotation.z);
-  // ship.rotateY((Math.PI / 365 /2) * inputs.turn);
   ship.rotateZ((degToRad(.5)) * -inputs.roll);
 
   if (opts.useMouse) {
-    ship.rotateX(getRotation(-mouse.y, delta, 0.005));
-    ship.rotateY(getRotation(-mouse.x, delta, 0.005));
+    ship.rotateX(getRotation(-mouse.y,ROTATION_RATE, delta, 0.005));
+    ship.rotateY(getRotation(-mouse.x,ROTATION_RATE*2, delta, 0.005));
   }
 }
 
