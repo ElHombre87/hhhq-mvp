@@ -88,6 +88,10 @@ const ShipComponent: React.FC = () => {
 
 const Camera: React.FC = () => {
   Refs.camera = useRef<THREE.Camera>(null!);
+  useFrame(() => {
+    updateFollowCamera(Refs.camera?.current, Refs.ship?.current);
+  });
+
   return (
     <PerspectiveCamera ref={Refs.camera} makeDefault fov={70} near={0.1} far={50000} name="main-camera" />
   )
@@ -121,9 +125,6 @@ const Target: React.FC = () => {
 }
 
 const Scene: React.FC = ({}) => {
-  useFrame(() => {
-    updateFollowCamera(Refs.camera?.current, Refs.ship?.current);
-  });
 
   return (
     <>
