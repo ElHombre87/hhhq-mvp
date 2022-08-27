@@ -14,7 +14,7 @@ import { isDarkTheme } from "utils/theme.utils";
 import { isNearly } from "utils/math";
 
 import { Ship, Viper } from "modules/webgl/assets";
-import { ShipControlsModal } from "modules/webgl/components";
+import { ShipControlsModal, ShipMatrixInfo } from "modules/webgl/components";
 import { CONTROLS } from "modules/webgl/config";
 import { InputController, Speeds, Velocity } from "modules/webgl/helpers/state";
 
@@ -172,14 +172,25 @@ const Scene: React.FC = ({}) => {
 export default function WebGLTestPage() {
   const canvas = useRef<HTMLCanvasElement>(null!)
   const { color } = useCanvasColor();
+  const [transform, setTransform] = useState<[THREE.Vector3, THREE.Euler]>([new THREE.Vector3(), new THREE.Euler()])
+  useEffect(() => {
+    const { ship } = Refs;
+    if (ship && ship.current)
+      setTransform([ship.current.position, ship.current.rotation])
+  }, [Refs.ship?.current])
 
   return (
-    <PageLayout pt={0} withContainer={false} sx={{body: { height: '100%', width: '100%', position: 'absolute'}}}>
+    <PageLayout
+      pt={0}
+      withContainer={false}
+      sx={{body: { height: '100%', width: '100%', position: 'absolute'}}}
+      sticky={<ShipMatrixInfo position={transform[0]} rotation={transform[1]}/>}
+    >
     <Suspense fallback={null}>
       <Canvas
         ref={canvas}
         shadows
-        style={{width: '100%', height: '100%',}}
+        style={{width: '100%', height: '100%'}}
         onCreated={({gl}) => {
           gl.setClearColor(color);
           openModal({
