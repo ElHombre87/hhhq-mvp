@@ -233,6 +233,9 @@ function useHandleKeyboardInputs(inputs: InputController, setMouseRotation: Reac
   
   useWindowEvent('keydown', inputs.updateKeys);
   useWindowEvent('keyup', inputs.updateKeys);
+  useHandleDebugInputs(inputs, setMouseRotation);
+}
+function useHandleDebugInputs(inputs: InputController, setMouseRotation: React.Dispatch<React.SetStateAction<boolean>>) {
 
   useWindowEvent('keydown', ({code}) => {
     switch(code) {
@@ -245,7 +248,17 @@ function useHandleKeyboardInputs(inputs: InputController, setMouseRotation: Reac
         break;
       case 'KeyY':
         setMouseRotation(s => !s); break;
-      default: return;
+      case 'Numpad4':
+        Refs.ship!.current.rotation.set(0,degToRad(90),0); break;
+      case 'Numpad8':
+        Refs.ship!.current.rotation.set(0,degToRad(0),0); break;
+      case 'Numpad6':
+        Refs.ship!.current.rotation.set(0,degToRad(-90),0); break;
+      case 'Numpad2':
+        Refs.ship!.current.rotation.set(0,degToRad(180),0); break;
+      default:
+        break;
+      
     }
   });
 }
