@@ -18,6 +18,9 @@ import { ShipControlsModal, ShipMatrixInfo } from "modules/webgl/components";
 import { CONTROLS } from "modules/webgl/config";
 import { InputController, Speeds, Velocity } from "modules/webgl/helpers/state";
 
+const CAMERA_MIN_DIST = -7;
+const CAMERA_MAX_DIST = -12;
+const CAMERA_HEIGHT = 2; //-5
 const Refs = new (class RefsContainer {
   ship: React.MutableRefObject<THREE.Group> = null!;
   mesh: React.MutableRefObject<THREE.Group> = null!;
@@ -197,9 +200,11 @@ const useCanvasColor = (theme?: MantineTheme) => {
 /** updates the active camera transform to follow the 'player' */
 function updateFollowCamera(camera: THREE.Camera, target: THREE.Group) {
   if (!camera || !target) return;
-  var relativeCameraOffset = new THREE.Vector3(0,5,lerp(-8, -12, clamp(shipState.fwd.current / shipState.fwd.max, 0, 1)));
-  var offset = relativeCameraOffset.applyMatrix4(target.matrixWorld);
+  const newZ = lerp(CAMERA_MIN_DIST, CAMERA_MAX_DIST, clamp(shipState.fwd.current / shipState.fwd.max, 0, 1));
+  const relativeCameraOffset = new THREE.Vector3(0, CAMERA_HEIGHT, newZ);
+  const offset = relativeCameraOffset.applyMatrix4(target.matrixWorld);
   camera.position.set(offset.x, offset.y, offset.z)
+  // camera.position.set(offset.x, offset.y, newZ)
   camera.lookAt(target.position);
 }
 
