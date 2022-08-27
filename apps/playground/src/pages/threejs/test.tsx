@@ -244,6 +244,7 @@ function useHandleKeyboardInputs(inputs: InputController, setMouseRotation: Reac
         Refs.ship!.current.rotation.set(0,0,0);
         shipState.fwd.current = 0;
         shipState.strafe.current = 0;
+        shipState.vertical.current = 0;
         break;
       case 'KeyY':
         setMouseRotation(s => !s); break;
