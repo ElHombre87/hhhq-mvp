@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Bounds, Center, Float, FlyControls, PerspectiveCamera, Sphere, Stars, Text3D, Trail } from "@react-three/drei";
+import { Center, Float, FlyControls, PerspectiveCamera, Sphere, Stars, Text3D, Trail } from "@react-three/drei";
 import { Canvas, useFrame } from '@react-three/fiber';
 import { clamp, degToRad, lerp } from "three/src/math/MathUtils";
 import * as THREE from 'three';
@@ -68,7 +68,7 @@ const ShipComponent: React.FC = () => {
   const Player = useShip();
   return (
     <>
-    <group ref={ship} scale={0.1} name="ship">
+    <group ref={ship} scale={WORLD_SCALE} name="ship">
       <Player ref={meshRef}/>
       {/* <Camera /> */}
     </group>
@@ -101,11 +101,12 @@ const Camera: React.FC = () => {
 
 
 const Target: React.FC = () => {
-  const ref = useRef<THREE.Mesh>(null!);
+  const ref = useRef<THREE.Group>(null!);
   const [inRange, setInRange] = useState<boolean>(false);
   useFrame(() => {
-    if (!Refs.ship) return;
-    setInRange(ref.current.position.distanceTo(Refs.ship.current.position) < 0.5);
+    if (!Refs.ship || !ref) return;
+    setInRange(ref.current?.position.distanceTo(Refs.ship.current.position) < 0.5);
+    ref.current.rotation.y += degToRad(.05);
   })
   useEffect(() => {
     if (inRange) {
@@ -117,12 +118,30 @@ const Target: React.FC = () => {
         autoClose: 2000,
       });
     }
-  }, [inRange])
+  }, [inRange]);
+
   return (
-    <mesh ref={ref} position={[0, 0, 5]} name="demo__target-cube">
-      <boxGeometry args={[0.5, 0.5, 0.5]} />
-      <meshStandardMaterial wireframe />
-    </mesh>
+    <Suspense fallback={null}>
+      <group ref={ref} position={[0, 0, 5]} rotation={[0, Math.PI, 0]}>
+      <Center>
+        <Float floatIntensity={1} speed={2}>
+          <Text3D
+            font={'/Montserrat_Bold.json'}
+            scale={WORLD_SCALE}
+            height={0.1}
+            bevelEnabled
+            bevelSegments={3}
+            bevelSize={0.05}
+            castShadow
+            receiveShadow
+          >
+            HHHQ
+            <meshPhysicalMaterial color="cyan" roughness={0.25} metalness={.25}  />
+          </Text3D>
+        </Float>
+      </Center>
+      </group>
+    </Suspense>
   )
 }
 
@@ -201,7 +220,7 @@ function updateFollowCamera(camera: THREE.Camera, target: THREE.Group) {
   const newZ = lerp(CAMERA_MIN_DIST, CAMERA_MAX_DIST, clamp(shipState.fwd.current / shipState.fwd.max, 0, 1));
   const relativeCameraOffset = new THREE.Vector3(0, CAMERA_HEIGHT, newZ);
   const offset = relativeCameraOffset.applyMatrix4(target.matrixWorld);
-  camera.position.set(offset.x, offset.y, offset.z)
+  camera.position.set(offset.x, offset.y, offset.z);
   // camera.position.set(offset.x, offset.y, newZ)
   camera.lookAt(target.position);
 }
