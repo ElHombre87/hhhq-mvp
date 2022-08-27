@@ -22,7 +22,10 @@ const CAMERA_MIN_DIST = -7;
 const CAMERA_MAX_DIST = -12;
 const CAMERA_HEIGHT = 2; //-5
 
-const ROTATION_RATE = 15;
+const ROTATION_RATE = 150;
+
+// apply to all object3d to match the proper sizing
+const WORLD_SCALE = 0.1;
 
 const Refs = new (class RefsContainer {
   ship: React.MutableRefObject<THREE.Group> = null!;
