@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { FlyControls, OrbitControls, PerspectiveCamera, Sphere, Stars, Trail } from "@react-three/drei";
+import { Bounds, Center, Float, FlyControls, PerspectiveCamera, Sphere, Stars, Text3D, Trail } from "@react-three/drei";
 import { Canvas, useFrame } from '@react-three/fiber';
 import { clamp, degToRad, lerp } from "three/src/math/MathUtils";
 import * as THREE from 'three';
@@ -178,7 +178,6 @@ export default function WebGLTestPage() {
       >
         <gridHelper position={[0, -1, 0]} />
         <FlyControls movementSpeed={1} />
-        <OrbitControls />
         <Scene />
       </Canvas>
     </Suspense>
