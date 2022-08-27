@@ -21,6 +21,9 @@ import { InputController, Speeds, Velocity } from "modules/webgl/helpers/state";
 const CAMERA_MIN_DIST = -7;
 const CAMERA_MAX_DIST = -12;
 const CAMERA_HEIGHT = 2; //-5
+
+const ROTATION_RATE = 15;
+
 const Refs = new (class RefsContainer {
   ship: React.MutableRefObject<THREE.Group> = null!;
   mesh: React.MutableRefObject<THREE.Group> = null!;
@@ -49,19 +52,12 @@ const ShipComponent: React.FC = () => {
   const [mouseRotation, setMouseRotation] = useState(true);
   /** hooks proxy to mantine useWindowEvent to bind keydown/up */
   useHandleKeyboardInputs(inputs.current, setMouseRotation);
-  const ROTATION_RATE = 15;
 
   useFrame(({mouse}, delta) => {
     if (!ship.current) return;
     const _ship = ship.current;
-    updateShipMovement(delta, inputs.current);
-    function getRotation(input: number, rate: number, deadzone = 0.05) {
-      return isNearly(input, 0, deadzone) ? 0 : input * rate * delta;
-    }
-    if (mouseRotation) {
-      ship.current.rotateX(getRotation(-mouse.y, lerp(0, degToRad(ROTATION_RATE*10), Math.abs(mouse.y)), 0.005));
-      ship.current.rotateY(getRotation(-mouse.x, lerp(0, degToRad(ROTATION_RATE*10), Math.abs(mouse.x)), 0.005));
-    }
+    updateShipMovement(inputs.current, mouse, delta, {useMouse: mouseRotation});
+    
       axesRef.current.position.set(_ship.position.x, _ship.position.y, _ship.position.z)
       axesRef.current.rotation.set(_ship.rotation.x, _ship.rotation.y, _ship.rotation.z)
   })
@@ -233,15 +229,19 @@ function useHandleKeyboardInputs(inputs: InputController, setMouseRotation: Reac
   });
 }
 
+function getRotation(input: number, delta: number, deadzone = 0.05) {
+  const rate = lerp(0, degToRad(ROTATION_RATE), Math.abs(input));
+  return isNearly(input, 0, deadzone) ? 0 : input * rate * delta;
+  
+}
 /** updates ship transform to reflect user inputs */
-function updateShipMovement(delta: number, inputs: InputController) {
+function updateShipMovement(inputs: InputController, mouse: THREE.Vector2, delta: number, opts: {useMouse: boolean}) {
   const ship = Refs.ship?.current;
-  const mesh = Refs.mesh?.current;
-  if (!ship || !mesh) return;
+  if (!ship) return;
 
   shipState.update(inputs);
   const { fwd, strafe, vertical } = shipState;
-  const MAX_YAW = degToRad(15);
+  // const MAX_YAW = degToRad(15);
   ship.translateZ(fwd.current * delta);
   ship.translateX(strafe.current * delta);
   ship.translateY(vertical.current * delta);
@@ -250,7 +250,10 @@ function updateShipMovement(delta: number, inputs: InputController) {
   // ship.rotateY((Math.PI / 365 /2) * inputs.turn);
   ship.rotateZ((degToRad(.5)) * -inputs.roll);
 
-  // Refs.mesh.current.rotation.z = -MAX_YAW * (strafe.current / strafe.max);
+  if (opts.useMouse) {
+    ship.rotateX(getRotation(-mouse.y, delta, 0.005));
+    ship.rotateY(getRotation(-mouse.x, delta, 0.005));
+  }
 }
 
 
