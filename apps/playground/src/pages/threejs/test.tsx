@@ -1,7 +1,7 @@
-import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Center, Float, FlyControls, PerspectiveCamera, Sphere, Stars, Text3D, Trail } from "@react-three/drei";
 import { Canvas, useFrame } from '@react-three/fiber';
-import { clamp, degToRad, lerp } from "three/src/math/MathUtils";
+import { clamp, damp, degToRad, lerp } from "three/src/math/MathUtils";
 import * as THREE from 'three';
 
 import { MantineTheme, useMantineTheme } from "@mantine/core";
@@ -14,12 +14,16 @@ import { isDarkTheme } from "utils/theme.utils";
 import { isNearly } from "utils/math";
 
 import { Ship, Viper } from "modules/webgl/assets";
-import { ShipControlsModal, ShipMatrixInfo } from "modules/webgl/components";
+import { ControlsUI, ShipControlsModal } from "modules/webgl/components";
 import { CONTROLS } from "modules/webgl/config";
 import { InputController, Speeds, Velocity } from "modules/webgl/helpers/state";
+import { GamePadController } from "modules/webgl/helpers/gamepad.controller";
+import { controllers } from "modules/webgl";
+import { interpret } from "xstate";
+import { useSelector } from "@xstate/react";
 
 const CAMERA_MIN_DIST = -7;
-const CAMERA_MAX_DIST = -12;
+const CAMERA_MAX_DIST = -15;
 const CAMERA_HEIGHT = 2; //-5
 
 const ROTATION_RATE = 150;
@@ -35,16 +39,16 @@ const Refs = new (class RefsContainer {
   ship: React.MutableRefObject<THREE.Group> = null!;
   mesh: React.MutableRefObject<THREE.Group> = null!;
   camera: React.MutableRefObject<THREE.Camera> = null!;
+  gamepad: React.MutableRefObject<GamePadController> = null!;
   constructor() {}
 })
 
-const shipState = new Speeds(
-  new Velocity(5, 5/100, .5),
-  new Velocity(2.5, 5/100),
-  new Velocity(2.5, 5/100),
-);
+const shipState = new Speeds(new Velocity(5, 5/100, .5),new Velocity(2.5, 5/100),new Velocity(2.5, 5/100),);
 
 const inputController = new InputController(CONTROLS);
+// const gamepadController = new GamePadController();
+
+const CONTROLLERS = interpret(controllers.machine).start();
 
 const ShipComponent: React.FC = () => {
   const ship = useRef<THREE.Group>(null!)
@@ -56,17 +60,17 @@ const ShipComponent: React.FC = () => {
     Refs.mesh = meshRef;
   }, [ship])
   const inputs = useRef(inputController);
-  const [mouseRotation, setMouseRotation] = useState(true);
-  /** hooks proxy to mantine useWindowEvent to bind keydown/up */
-  useHandleKeyboardInputs(inputs.current, setMouseRotation);
+  const useMouse = useSelector(CONTROLLERS, controllers.selectors.useMouse);
+  const useGamepad = useSelector(CONTROLLERS, controllers.selectors.useGamepad);
+  useInputControls(inputs.current);
 
   useFrame(({mouse}, delta) => {
     if (!ship.current) return;
     const _ship = ship.current;
-    updateShipMovement(inputs.current, mouse, delta, {useMouse: mouseRotation});
+    updateShipMovement(inputs.current, mouse, delta, {useMouse, useGamepad});
     
-      axesRef.current.position.set(_ship.position.x, _ship.position.y, _ship.position.z)
-      axesRef.current.rotation.set(_ship.rotation.x, _ship.rotation.y, _ship.rotation.z)
+    axesRef.current.position.set(_ship.position.x, _ship.position.y, _ship.position.z)
+    axesRef.current.rotation.set(_ship.rotation.x, _ship.rotation.y, _ship.rotation.z)
   })
 
   const Player = useShip();
@@ -151,7 +155,9 @@ const Target: React.FC = () => {
 }
 
 const Scene: React.FC = ({}) => {
-
+  useFrame(() => {
+    Refs.gamepad?.current?.update();
+  })
   return (
     <>
       <ambientLight intensity={0.2} />
@@ -173,25 +179,57 @@ const Scene: React.FC = ({}) => {
 export default function WebGLTestPage() {
   const canvas = useRef<HTMLCanvasElement>(null!)
   const { color } = useCanvasColor();
-  const [transform, setTransform] = useState<[THREE.Vector3, THREE.Euler]>([new THREE.Vector3(), new THREE.Euler()])
+  Refs.gamepad = useRef<GamePadController>(null!);
+  // useEffect(() => {
+  //   gamepadController.onGamepadListChanged(gamepads => {
+  //     console.info('🎮 xstate gamepad changed', gamepads)
+  //     CONTROLLERS.send('GAMEPADS_CHANGED', { gamepads })
+  //   })
+  //   Refs.gamepad.current = gamepadController;
+  // },[]);
+
   useEffect(() => {
-    const { ship } = Refs;
-    if (ship && ship.current)
-      setTransform([ship.current.position, ship.current.rotation])
-  }, [Refs.ship?.current])
+    CONTROLLERS.send('GAMEPADS_CHANGED', { gamepads: Refs.gamepad?.current?.gamepads ?? [] })
+  }, [Refs.gamepad?.current?.gamepads]);
+  useEffect(() => {
+    CONTROLLERS.send('SET_GAMEPAD', { name: Refs.gamepad?.current?.activeGamepad ?? '' })
+  }, [Refs.gamepad?.current?.activeGamepad]);
+
+
+  const useMouse = useSelector(CONTROLLERS, controllers.selectors.useMouse);
+  const useGamepad = useSelector(CONTROLLERS, controllers.selectors.useGamepad);
+  const gamepads = useSelector(CONTROLLERS, controllers.selectors.gamepads);
+  const activeGamepad = useSelector(CONTROLLERS, controllers.selectors.activePad);
+  const context = useSelector(CONTROLLERS, state => state.context);
+  useEffect(() => console.info(context), [context])
+  const toggleMouse = useCallback(() => CONTROLLERS.send('TOGGLE_MOUSE'), [])
+  const toggleGamepad = useCallback(() => CONTROLLERS.send('TOGGLE_GAMEPAD'), [])
 
   return (
     <PageLayout
       pt={0}
       withContainer={false}
       sx={{body: { height: '100%', width: '100%', position: 'absolute'}}}
-      sticky={<ShipMatrixInfo position={transform[0]} rotation={transform[1]}/>}
+      sticky={
+        <ControlsUI
+          mouse={useMouse}
+          gamepad={useGamepad}
+          toggleMouse={toggleMouse}
+          toggleGamepad={toggleGamepad}
+          gamepads={gamepads}
+          active={activeGamepad}
+        />}
+      // sticky={<ShipMatrixInfo position={transform.position} rotation={transform.rotation}/>}
     >
-    <Suspense fallback={null}>
+    <Suspense fallback={<div>Loading</div>}>
       <Canvas
         ref={canvas}
         shadows
-        style={{width: '100%', height: '100%'}}
+        style={{
+          width: '100%',
+          height: '100%',
+          // cursor: 'none',
+        }}
         onCreated={({gl}) => {
           gl.setClearColor(color);
           openModal({
@@ -200,7 +238,7 @@ export default function WebGLTestPage() {
           });
         }}
       >
-        <gridHelper position={[0, -1, 0]} />
+        <gridHelper position={[0, -1, 0]} scale={10}  />
         <FlyControls movementSpeed={1} />
         <Scene />
       </Canvas>
@@ -241,13 +279,13 @@ function updateFollowCamera(camera: THREE.Camera, target: THREE.Group) {
  * binds the InputController (and optionally other inputs) to the dom events
  * through built-in mantine hooks
  */
-function useHandleKeyboardInputs(inputs: InputController, setMouseRotation: React.Dispatch<React.SetStateAction<boolean>>) {
+function useInputControls(inputs: InputController) {
   
   useWindowEvent('keydown', inputs.updateKeys);
   useWindowEvent('keyup', inputs.updateKeys);
-  useHandleDebugInputs(inputs, setMouseRotation);
+  useHandleDebugInputs(inputs);
 }
-function useHandleDebugInputs(inputs: InputController, setMouseRotation: React.Dispatch<React.SetStateAction<boolean>>) {
+function useHandleDebugInputs(_: InputController) {
 
   useWindowEvent('keydown', ({code}) => {
     switch(code) {
@@ -259,7 +297,8 @@ function useHandleDebugInputs(inputs: InputController, setMouseRotation: React.D
         shipState.vertical.current = 0;
         break;
       case 'KeyY':
-        setMouseRotation(s => !s); break;
+        // setMouseRotation(); break;
+        CONTROLLERS.send('TOGGLE_MOUSE'); break;
       case 'Numpad4':
         Refs.ship!.current.rotation.set(0,degToRad(90),0); break;
       case 'Numpad8':
@@ -280,32 +319,33 @@ function getRotation(input: number, rate: number, delta: number, deadzone = 0.05
   return isNearly(input, 0, deadzone) ? 0 : input * _rate * delta;
   
 }
+
+type ShipMovementOptions = {useMouse?: boolean, useGamepad?:boolean};
 /** updates ship transform to reflect user inputs */
-function updateShipMovement(inputs: InputController, mouse: THREE.Vector2, delta: number, opts: {useMouse: boolean}) {
+function updateShipMovement(inputs: InputController, mouse: THREE.Vector2, dt: number, opts: ShipMovementOptions) {
   const ship = Refs.ship?.current;
   if (!ship) return;
 
-  shipState.update(inputs);
+  shipState.update(inputs) //, opts.useGamepad ? gamepadController : undefined);
+
   const { fwd, strafe, vertical } = shipState;
   // const MAX_YAW = degToRad(15);
-  ship.translateZ(fwd.current * delta);
-  ship.translateX(strafe.current * delta);
-  ship.translateY(vertical.current * delta);
-
-  // ship.rotateY((degToRad(.5)) * inputs.roll);
+  ship.translateZ(fwd.current * dt);
+  ship.translateX(strafe.current * dt);
+  ship.translateY(vertical.current * dt);
   ship.rotateOnAxis(AxisZ, degToRad(.5) * -inputs.roll);
-  if (Refs?.mesh?.current)
-    Refs.mesh.current.rotation.z = degToRad(5) * inputs.roll;
+  // console.info(gamepadController.pan.y)
+  // ship.translateZ(5* gamepadController.pan.y * delta);
 
   if (opts.useMouse) {
-    // ship.rotateX(getRotation(-mouse.y,ROTATION_RATE, delta, 0.005));
-    // ship.rotateZ(getRotation(mouse.x,ROTATION_RATE*2, delta, 0.005));
-    ship.rotateOnAxis(AxisX, getRotation(-mouse.y,ROTATION_RATE, delta, 0.005));
-    const roll = getRotation(mouse.x,ROTATION_RATE*2, delta, 0.005);
-    ship.rotateOnAxis(AxisY, -roll);
-    if (Refs?.mesh?.current)
+    // ship.rotateOnAxis(AxisZ, getRotation(mouse.x, ROTATION_RATE/4, dt, 0.005));
+    ship.rotateOnAxis(AxisX, getRotation(-mouse.y, ROTATION_RATE, dt, 0.005));
+    ship.rotateOnAxis(AxisY, -getRotation(mouse.x,ROTATION_RATE*2, dt, 0.005));
+    if (Refs?.mesh?.current) {
+      // Refs.mesh.current.rotation.z = degToRad(5) * strafe.current;
       Refs.mesh.current.rotation.z = degToRad(15) * mouse.x;
       Refs.mesh.current.rotation.x = degToRad(15) * -mouse.y;
+    }
   }
 }
 
