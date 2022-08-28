@@ -27,6 +27,10 @@ const ROTATION_RATE = 150;
 // apply to all object3d to match the proper sizing
 const WORLD_SCALE = 0.1;
 
+const AxisX = new THREE.Vector3(1,0,0);
+const AxisY = new THREE.Vector3(0,1,0);
+const AxisZ = new THREE.Vector3(0,0,1);
+
 const Refs = new (class RefsContainer {
   ship: React.MutableRefObject<THREE.Group> = null!;
   mesh: React.MutableRefObject<THREE.Group> = null!;
@@ -70,9 +74,10 @@ const ShipComponent: React.FC = () => {
     <>
     <group ref={ship} scale={WORLD_SCALE} name="ship">
       <Player ref={meshRef}/>
-      {/* <Camera /> */}
     </group>
     <axesHelper ref={axesRef}/>
+    <Camera />
+    {/* <axesHelper ref={axesRef}/> */}
     <Trail
       width={1} // Width of the line
       color={'#F8D628'} // Color of the line
@@ -151,7 +156,7 @@ const Scene: React.FC = ({}) => {
     <>
       <ambientLight intensity={0.2} />
       <pointLight intensity={1.0} position={[10, 10, 10]} />
-      <Camera />
+      {/* <Camera /> */}
       <Stars radius={500} depth={500} count={50_000}/>
       {/* <Sparkles rotation={[0,0,Math.PI/4]} size={.75} count={10000} opacity={0.5} noise={1} speed={0.025} scale={50} /> */}
       {/* World Center */}
@@ -217,12 +222,19 @@ const useCanvasColor = (theme?: MantineTheme) => {
 /** updates the active camera transform to follow the 'player' */
 function updateFollowCamera(camera: THREE.Camera, target: THREE.Group) {
   if (!camera || !target) return;
-  const newZ = lerp(CAMERA_MIN_DIST, CAMERA_MAX_DIST, clamp(shipState.fwd.current / shipState.fwd.max, 0, 1));
-  const relativeCameraOffset = new THREE.Vector3(0, CAMERA_HEIGHT, newZ);
-  const offset = relativeCameraOffset.applyMatrix4(target.matrixWorld);
+  function lerpSpeed(min:number, max: number) {
+    return lerp(min, max, clamp(shipState.fwd.current / shipState.fwd.max, 0, 1));
+  }
+  const newZ = lerpSpeed(CAMERA_MIN_DIST, CAMERA_MAX_DIST);
+  const newY = lerpSpeed(3, 1)
+  const relativeCameraOffset = new THREE.Vector3(0, newY, newZ);
+  let offset = relativeCameraOffset.applyMatrix4(target.matrixWorld);
   camera.position.set(offset.x, offset.y, offset.z);
+  // console.info(radToDeg(target.rotation.x), radToDeg(camera.rotation.x))
   // camera.position.set(offset.x, offset.y, newZ)
   camera.lookAt(target.position);
+  // camera.lookAt(0,0,0)
+
 }
 
 /**
@@ -279,11 +291,21 @@ function updateShipMovement(inputs: InputController, mouse: THREE.Vector2, delta
   ship.translateZ(fwd.current * delta);
   ship.translateX(strafe.current * delta);
   ship.translateY(vertical.current * delta);
-  ship.rotateZ((degToRad(.5)) * -inputs.roll);
+
+  // ship.rotateY((degToRad(.5)) * inputs.roll);
+  ship.rotateOnAxis(AxisZ, degToRad(.5) * -inputs.roll);
+  if (Refs?.mesh?.current)
+    Refs.mesh.current.rotation.z = degToRad(5) * inputs.roll;
 
   if (opts.useMouse) {
-    ship.rotateX(getRotation(-mouse.y,ROTATION_RATE, delta, 0.005));
-    ship.rotateY(getRotation(-mouse.x,ROTATION_RATE*2, delta, 0.005));
+    // ship.rotateX(getRotation(-mouse.y,ROTATION_RATE, delta, 0.005));
+    // ship.rotateZ(getRotation(mouse.x,ROTATION_RATE*2, delta, 0.005));
+    ship.rotateOnAxis(AxisX, getRotation(-mouse.y,ROTATION_RATE, delta, 0.005));
+    const roll = getRotation(mouse.x,ROTATION_RATE*2, delta, 0.005);
+    ship.rotateOnAxis(AxisY, -roll);
+    if (Refs?.mesh?.current)
+      Refs.mesh.current.rotation.z = degToRad(15) * mouse.x;
+      Refs.mesh.current.rotation.x = degToRad(15) * -mouse.y;
   }
 }
 
