@@ -7,6 +7,7 @@ import { isNearly } from "utils/math"
 import { clamp } from "three/src/math/MathUtils";
 import { Movements, InputConfig } from "../types";
 import { Vector3, Euler } from 'three';
+import { GamePadController } from "./gamepad.controller";
 
 export class Velocity {
   public current = 0;
@@ -37,10 +38,17 @@ export class Speeds {
     public vertical: Velocity,
     // public pitch: number,
   ) {}
-  update(moves: Movements) {
+  update(moves: Movements, gamepad?: GamePadController) {
     this.fwd.compute(moves.translation.z, moves.break);
     this.strafe.compute(moves.translation.x, moves.break);
     this.vertical.compute(moves.translation.y, moves.break);
+
+    // if a gamepad controller has not been provided do not use.
+    // TODO: pass the option for the gamepad enabled
+    if (!gamepad) return this;
+    this.fwd.compute(-gamepad.pan.y, moves.break);
+    this.strafe.compute(-gamepad.pan.x, moves.break);
+    this.vertical.compute(gamepad.pan.z, moves.break);
     return this;
   }
 }
@@ -84,7 +92,8 @@ export class InputController implements Movements {
     // if any of the provided key mapping didn't change return the current value (allows for multiple active axes)
     if (!config.find(([keys]) => keys.includes(event.code))) return current;
 
-    return config.reduce((prev, [keys, press, release]) => InputController._evaluate(keys, prev, event, press, release ?? 0), 0)
+    return config.reduce((prev, [keys, press, release]) =>
+      InputController._evaluate(keys, prev, event, press, release ?? 0), 0);
   }
 }
 
