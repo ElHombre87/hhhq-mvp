@@ -25,9 +25,9 @@ export  const ControlsUI: React.FC<ControlsUI> = ({
     // removes technical id from label
     value: name, label: name.split('(')[0]
   })), [gamepads])
+
   return (
     <Group>
-      <Text color="dimmed">Input selection</Text>
       <Tooltip label="toggle mouse" position="bottom-start">
         <ActionIcon
           size="md"
@@ -59,7 +59,7 @@ export  const ControlsUI: React.FC<ControlsUI> = ({
           value={active}
           data={_gamepads}
           icon={<DeviceGamepad2 />}
-          placeholder="Gamepad select"
+          placeholder="no gamepad selected"
         />
       </Tooltip>
     </Group>

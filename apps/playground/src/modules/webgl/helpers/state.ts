@@ -20,7 +20,11 @@ export class Velocity {
     this.current = Velocity._compute(this, direction) + Velocity._break(this, breaking);
     return this.current;
   }
-  
+  /** enforces a slowing acceleration on this velocity vector */
+  halt() {
+    this.current = Velocity._compute(this, 0) + Velocity._break(this, true);
+    return this.current;
+  }
   private static _compute(self: Velocity, direction: number) {
     return clamp(self.current + (self.acceleration * direction), -self.max, self.max)
   }
@@ -31,15 +35,24 @@ export class Velocity {
   }
 }
 
+export interface SpeedOptions {
+  /** if true, applying acceleration fwd/bck will slow down other axis */
+  breakOnForward?: boolean;
+}
 export class Speeds {
   constructor(
     public fwd: Velocity,
     public strafe: Velocity,
     public vertical: Velocity,
+    public options: SpeedOptions = {}
     // public pitch: number,
   ) {}
   update(moves: Movements, gamepad?: GamePadController) {
     this.fwd.compute(moves.translation.z, moves.break);
+    if (this.options.breakOnForward && !isNearly(moves.translation.z, 0, 0.05)) {
+      this.strafe.halt();
+      this.vertical.halt();
+    }
     this.strafe.compute(moves.translation.x, moves.break);
     this.vertical.compute(moves.translation.y, moves.break);
 
@@ -67,7 +80,7 @@ export class InputController implements Movements {
   constructor(private inputs: InputConfig) {
   }
   
-  updateKeys = (event: KeyboardEvent) => {
+  update = (event: KeyboardEvent) => {
     this.translation.set(
       InputController.evaluateAxis(this.translation.x, event, [this.inputs.left, 1], [this.inputs.right, -1]),
       InputController.evaluateAxis(this.translation.y, event, [this.inputs.up, 1], [this.inputs.down, -1]),

@@ -24,7 +24,6 @@ import { useSelector } from "@xstate/react";
 
 const CAMERA_MIN_DIST = -7;
 const CAMERA_MAX_DIST = -15;
-const CAMERA_HEIGHT = 2; //-5
 
 const ROTATION_RATE = 150;
 
@@ -43,7 +42,7 @@ const Refs = new (class RefsContainer {
   constructor() {}
 })
 
-const shipState = new Speeds(new Velocity(5, 5/100, .5),new Velocity(2.5, 5/100),new Velocity(2.5, 5/100),);
+const shipState = new Speeds(new Velocity(5, 2.5/100, .5),new Velocity(2.5, 5/100),new Velocity(1.5, 1/100),);
 
 const inputController = new InputController(CONTROLS);
 // const gamepadController = new GamePadController();
@@ -180,19 +179,12 @@ export default function WebGLTestPage() {
   const canvas = useRef<HTMLCanvasElement>(null!)
   const { color } = useCanvasColor();
   Refs.gamepad = useRef<GamePadController>(null!);
-  // useEffect(() => {
-  //   gamepadController.onGamepadListChanged(gamepads => {
-  //     console.info('🎮 xstate gamepad changed', gamepads)
-  //     CONTROLLERS.send('GAMEPADS_CHANGED', { gamepads })
-  //   })
-  //   Refs.gamepad.current = gamepadController;
-  // },[]);
 
   useEffect(() => {
     CONTROLLERS.send('GAMEPADS_CHANGED', { gamepads: Refs.gamepad?.current?.gamepads ?? [] })
   }, [Refs.gamepad?.current?.gamepads]);
   useEffect(() => {
-    CONTROLLERS.send('SET_GAMEPAD', { name: Refs.gamepad?.current?.activeGamepad ?? '' })
+    CONTROLLERS.send('SET_GAMEPAD', { name: Refs.gamepad?.current?.activeGamepad })
   }, [Refs.gamepad?.current?.activeGamepad]);
 
 
@@ -200,9 +192,7 @@ export default function WebGLTestPage() {
   const useGamepad = useSelector(CONTROLLERS, controllers.selectors.useGamepad);
   const gamepads = useSelector(CONTROLLERS, controllers.selectors.gamepads);
   const activeGamepad = useSelector(CONTROLLERS, controllers.selectors.activePad);
-  const context = useSelector(CONTROLLERS, state => state.context);
-  useEffect(() => console.info(context), [context])
-  const toggleMouse = useCallback(() => CONTROLLERS.send('TOGGLE_MOUSE'), [])
+    const toggleMouse = useCallback(() => CONTROLLERS.send('TOGGLE_MOUSE'), [])
   const toggleGamepad = useCallback(() => CONTROLLERS.send('TOGGLE_GAMEPAD'), [])
 
   return (
@@ -281,8 +271,8 @@ function updateFollowCamera(camera: THREE.Camera, target: THREE.Group) {
  */
 function useInputControls(inputs: InputController) {
   
-  useWindowEvent('keydown', inputs.updateKeys);
-  useWindowEvent('keyup', inputs.updateKeys);
+  useWindowEvent('keydown', inputs.update);
+  useWindowEvent('keyup', inputs.update);
   useHandleDebugInputs(inputs);
 }
 function useHandleDebugInputs(_: InputController) {
