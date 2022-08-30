@@ -4,7 +4,7 @@ export type TControlType = "keyboard" | "mouse" | "gamepad";
 export type TControlConfiguration = {
   controller: TControlType;
   inputs: string[];
-  scale: number;
+  scale?: number;
   name: string;
 };
 
@@ -25,5 +25,5 @@ export type TControlAxis<K extends TControlsConfig = TControlsConfig> = keyof K;
 export type TControlAxisValues = { [axis in TControlAxis]: number };
 
 // can be used when a single object is required for all values
-export type TControlConfig = TControlConfiguration & { axis: TControlAxis };
+export type TControlConfig<C extends TControlConfiguration = TControlConfiguration> = C & { axis: TControlAxis };
 export type TControlsConfig = TInputsConfiguration<TControlConfig>;

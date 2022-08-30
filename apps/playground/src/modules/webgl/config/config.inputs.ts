@@ -1,7 +1,4 @@
-import type {
-  TInputsConfiguration,
-  TControlsConfig
-} from "../controllers/InputController/types";
+import type { TInputsConfiguration, TControlsConfig } from "../controllers/InputController/types";
 
 /** Configuration for axis inputs. */
 export const configuration: TInputsConfiguration = {
@@ -47,7 +44,7 @@ export const configuration: TInputsConfiguration = {
       scale: -1
     }
   ],
-  yaw: [{ name: "yaw", controller: "mouse", inputs: ["x"], scale: -1 }],
+  yaw: [{ name: "yaw", controller: "mouse", inputs: ["x"], scale: 1 }],
   pitch: [{ name: "pitch", controller: "mouse", inputs: ["y"], scale: -1 }],
   roll: [
     {
@@ -73,7 +70,7 @@ export function createConfig(c: TInputsConfiguration): TControlsConfig {
   const entries = Object.entries(c);
   const mapped = entries.map(([axis, controls]) => [
     axis,
-    controls.map((control) => ({ ...control, axis }))
+    controls.map((control) => ({ ...control, axis, scale: control.scale ?? 1 }))
   ]);
   return Object.fromEntries(mapped);
 }
