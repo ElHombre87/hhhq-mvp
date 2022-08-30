@@ -39,7 +39,7 @@ function updateFollowCamera(camera: THREE.Camera, target: THREE.Object3D) {
   // }
   // const newZ = lerpSpeed(CAMERA_MIN_DIST, CAMERA_MAX_DIST);
   // const newY = lerpSpeed(3, 1)
-  const newZ = 5;
+  const newZ = -7;
   const newY = 2;
   const relativeCameraOffset = new Vector3(0, newY, newZ);
   let offset = relativeCameraOffset.applyMatrix4(target.matrixWorld);
