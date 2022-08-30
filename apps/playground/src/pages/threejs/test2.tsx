@@ -9,11 +9,12 @@ import { Target } from "modules/webgl/components/3d/Target.temp";
 import { useInputManager } from "modules/webgl/hooks/useInputManager";
 import { PlayerShip } from "modules/webgl/components/3d/Ship.temp";
 import { refs } from 'modules/webgl/machines'
-import { openModal } from "@mantine/modals";
+import { openConfirmModal, openModal } from "@mantine/modals";
 import { IInputsManager } from "modules/webgl";
 import { ConfigTable } from "modules/webgl/components/ConfigTable";
 // import { degToRad } from "three/src/math/MathUtils";
-// import { useWindowEvent } from "@mantine/hooks";
+import { useWindowEvent } from "@mantine/hooks";
+import { Text } from "@mantine/core";
 
 const Scene: React.FC = ({}) => {
   const inputs = useInputManager();
@@ -56,6 +57,20 @@ export function openControlsModal(inputs: IInputsManager) {
     children: <ConfigTable config={inputs.config} />,
     onClose: () => inputs.start(),
     withCloseButton: false
+  });
+}
+
+export function openPauseModal(inputs: IInputsManager) {
+  inputs.stop();
+  openConfirmModal({
+    size: "xl",
+    trapFocus: false,
+    title: 'Pause',
+    children: (<Text>Click Resume to continue</Text>),
+    onConfirm: () => inputs.start(),
+    withCloseButton: false,
+    labels: { confirm: 'Resume', cancel: ''},
+    cancelProps: {sx: { display: 'none' }}
   });
 }
 
