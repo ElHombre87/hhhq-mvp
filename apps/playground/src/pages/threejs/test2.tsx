@@ -65,8 +65,14 @@ export default function WebGLTestPage() {
     refs.sendRef('canvas', canvasRef);
   }, [canvasRef])
   const inputs = useInputManager();
-  // const ship = refs.useShip();
-  // useHandleDebugInputs(ship);
+  useWindowEvent('keydown', ({code}) => {
+    switch(code) {
+      case 'KeyP':
+        return openPauseModal(inputs);
+      case 'KeyO':
+        return inputs.running ? inputs.stop() : inputs.start();
+    }
+  })
   const color = '#2a2a2a';
 
   return (
