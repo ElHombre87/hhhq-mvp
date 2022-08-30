@@ -42,7 +42,14 @@ const Refs = new (class RefsContainer {
   constructor() {}
 })
 
-const shipState = new Speeds(new Velocity(5, 2.5/100, .5),new Velocity(2.5, 5/100),new Velocity(1.5, 1/100),);
+const shipState = new Speeds(
+  new Velocity(5, 2.5/100, .5),
+  new Velocity(2.5, 5/100),
+  new Velocity(1.5, 1/100),
+  {
+    breakOnForward: true,
+  }
+  );
 
 const inputController = new InputController(CONTROLS);
 // const gamepadController = new GamePadController();
