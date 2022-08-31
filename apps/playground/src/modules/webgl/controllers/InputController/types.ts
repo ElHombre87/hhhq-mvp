@@ -6,6 +6,7 @@ export type TControlConfiguration = {
   inputs: string[];
   scale?: number;
   name: string;
+  type?: 'digital' | 'analog';
 };
 
 /** aggregate type of {[name of axis to control]: Control } */

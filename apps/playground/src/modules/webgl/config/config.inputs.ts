@@ -1,7 +1,25 @@
 import type { TInputsConfiguration, TControlsConfig } from "../controllers/InputController/types";
 
 /** Configuration for axis inputs. */
-export const configuration: TInputsConfiguration = {
+/**
+ * takes a TInputConfiguration object and parses it to finalize
+ * its structure
+ */
+export function createConfig(c: TInputsConfiguration): TControlsConfig {
+  const entries = Object.entries(c);
+  const mapped = entries.map(([axis, controls]) => [
+    axis,
+    controls.map((control) => ({
+      ...control,
+      axis,
+      type: control.type ?? 'digital',
+      scale: control.scale ?? 1,
+    }))
+  ]);
+  return Object.fromEntries(mapped);
+}
+
+export const config = createConfig({
   forward: [
     {
       name: "forward",
@@ -44,8 +62,8 @@ export const configuration: TInputsConfiguration = {
       scale: -1
     }
   ],
-  yaw: [{ name: "yaw", controller: "mouse", inputs: ["x"], scale: 1 }],
-  pitch: [{ name: "pitch", controller: "mouse", inputs: ["y"], scale: -1 }],
+  yaw: [{ name: "yaw", controller: "mouse", inputs: ["x"], scale: 1, type: 'analog' }],
+  pitch: [{ name: "pitch", controller: "mouse", inputs: ["y"], scale: -1, type: 'analog' }],
   roll: [
     {
       name: "roll left",
@@ -60,19 +78,4 @@ export const configuration: TInputsConfiguration = {
       scale: -1
     }
   ]
-};
-
-/**
- * takes a TInputConfiguration object and parses it to finalize
- * its structure
- */
-export function createConfig(c: TInputsConfiguration): TControlsConfig {
-  const entries = Object.entries(c);
-  const mapped = entries.map(([axis, controls]) => [
-    axis,
-    controls.map((control) => ({ ...control, axis, scale: control.scale ?? 1 }))
-  ]);
-  return Object.fromEntries(mapped);
-}
-
-export const config = createConfig(configuration);
+});
