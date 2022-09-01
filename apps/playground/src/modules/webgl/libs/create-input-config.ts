@@ -5,7 +5,7 @@ import type {
   TInputType,
   UserInputConfiguration,
 } from "./types";
-import { Optionals } from "libs/types";
+import { OptionalPropertyOf, Optionals, } from "libs/types";
 
 /**
  * Create and finalize an axis configuration object with safe typing
@@ -25,7 +25,8 @@ export function createConfiguration<
   },
   // defaults config shape, based on base TInputType and dynamic values.
   // properties of TInputType are added down internally
-  Defaults = Omit<Optionals<InShape>, "name" | "axis" | "scale" | "type">,
+  DefaultsKeys extends Exclude<OptionalPropertyOf<InShape>, "name" | "axis">,
+  Defaults = { [key in DefaultsKeys]: Exclude<InShape[key], undefined> }
 >(
   options: Options,
   config: Source

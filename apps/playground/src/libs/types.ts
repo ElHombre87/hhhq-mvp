@@ -18,4 +18,12 @@ export type OptionalPropertyOf<T extends object> = Exclude<
  * Returns an object-like type with all the optional properties of the given type
  * requried, with undefined exluded (but not null)
  */
-export type Optionals<T extends object> = {[key in OptionalPropertyOf<T>]: Exclude<T[key], undefined> }
+ export type Optionals<T extends object, K extends keyof T = OptionalPropertyOf<T>> = {
+  [key in K]: Exclude<T[key], undefined>;
+};
+
+
+type A = {a: number, b?:string, c?:boolean}
+
+type B = Optionals<A>
+type C = WithOptional<Optionals<A>, 'b'>
