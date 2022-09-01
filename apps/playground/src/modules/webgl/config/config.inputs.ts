@@ -1,25 +1,9 @@
-import type { TInputsConfiguration, TControlsConfig } from "../controllers/InputController/types";
+import { createConfiguration } from "../libs";
 
-/** Configuration for axis inputs. */
-/**
- * takes a TInputConfiguration object and parses it to finalize
- * its structure
- */
-export function createConfig(c: TInputsConfiguration): TControlsConfig {
-  const entries = Object.entries(c);
-  const mapped = entries.map(([axis, controls]) => [
-    axis,
-    controls.map((control) => ({
-      ...control,
-      axis,
-      type: control.type ?? 'digital',
-      scale: control.scale ?? 1,
-    }))
-  ]);
-  return Object.fromEntries(mapped);
-}
 
-export const config = createConfig({
+export const config = createConfiguration({
+  defaults: {},
+},{
   forward: [
     {
       name: "forward",

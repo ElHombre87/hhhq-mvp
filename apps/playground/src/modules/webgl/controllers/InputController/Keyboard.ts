@@ -1,9 +1,9 @@
 import { AControlsManager } from "./AControlsManager";
-import { TControlConfig, TControlAxis, TControlType } from "./types";
+import { InputConfiguration, TControllerType } from "../../libs/types";
 
 function matchingBinding(
   manager: KeyboardManager,
-  mappings: TControlConfig[],
+  mappings: Readonly<InputConfiguration[]>,
   eventCode: string
 ) {
   return mappings.filter(
@@ -13,7 +13,7 @@ function matchingBinding(
 }
 
 export class KeyboardManager extends AControlsManager {
-  public readonly type: TControlType = "keyboard";
+  public readonly type: TControllerType = "keyboard";
 
   update(event: KeyboardEvent) {}
 
@@ -36,7 +36,7 @@ export class KeyboardManager extends AControlsManager {
     const { config } = this.parent;
     Object.entries(config).forEach(([axis, mappings]) => {
       const key = matchingBinding(this, mappings, code);
-      if (key) this.sendParent(axis as TControlAxis, key.scale, this.type);
+      if (key) this.sendParent(axis, key.scale, this.type);
     });
   };
 
@@ -45,7 +45,7 @@ export class KeyboardManager extends AControlsManager {
     const { config } = this.parent;
     Object.entries(config).forEach(([axis, mappings]) => {
       const key = matchingBinding(this, mappings, code);
-      if (key) this.sendParent(axis as TControlAxis, -key.scale, this.type);
+      if (key) this.sendParent(axis, -key.scale, this.type);
     });
   };
 }

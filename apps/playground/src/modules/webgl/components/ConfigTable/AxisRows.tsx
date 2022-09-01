@@ -1,11 +1,11 @@
 import React from "react";
 import { Center, Kbd, Text } from "@mantine/core";
-import type { TControlConfig } from "modules/webgl/controllers/InputController/types";
+import type { InputConfiguration } from "modules/webgl/controllers/InputController/types";
 import { getIcon, formatInputValue } from "./helpers";
 import { deviceIcons } from "./icons";
 
 
-export const AxisControl: React.FC<{ control: TControlConfig; maxCount: number }> = ({
+export const AxisControl: React.FC<{ control: InputConfiguration; maxCount: number }> = ({
   control,
   maxCount = 1
 }) => {
@@ -52,7 +52,7 @@ export const AxisControl: React.FC<{ control: TControlConfig; maxCount: number }
 
 export const AxisRows: React.FC<{
   axis: string;
-  controls: TControlConfig[];
+  controls: InputConfiguration[];
   maxCount: number;
 }> = ({ axis, controls, maxCount }) => {
   return (

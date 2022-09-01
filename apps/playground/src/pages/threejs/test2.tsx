@@ -1,26 +1,21 @@
-import { Suspense, useCallback, useRef, useEffect, useMemo } from "react";
+import { Suspense, useCallback, useRef, useEffect } from "react";
 import { showNotification } from "@mantine/notifications";
 import { FlyControls, Sphere, Stars } from "@react-three/drei";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 
 import PageLayout from "layouts/PageLayout";
 
 import { Target } from "modules/webgl/components/3d/Target.temp";
-import { useInputManager } from "modules/webgl/hooks/useInputManager";
+import { useInputManager } from "modules/webgl/hooks/use-inputs-manager";
 import { PlayerShip } from "modules/webgl/components/3d/Ship.temp";
 import { refs } from 'modules/webgl/machines'
-import { openConfirmModal, openModal } from "@mantine/modals";
-import { IInputsManager } from "modules/webgl";
-import { ConfigTable } from "modules/webgl/components/ConfigTable";
 // import { degToRad } from "three/src/math/MathUtils";
 import { useWindowEvent } from "@mantine/hooks";
-import { Text } from "@mantine/core";
+import { usePauseSystem } from "modules/webgl/hooks/use-pause-system";
+import { useShip } from "modules/webgl/machines/refs.machine";
 
 const Scene: React.FC = ({}) => {
-  const inputs = useInputManager();
-  useFrame(() => {
-    inputs.update();
-  })
+
   const targetReached = useCallback(() => {
     showNotification({
       color: 'green',
@@ -49,46 +44,32 @@ const Scene: React.FC = ({}) => {
   )
 }
 
-export function openControlsModal(inputs: IInputsManager) {
-  inputs.stop();
-  openModal({
-    size: "xl",
-    trapFocus: false,
-    children: <ConfigTable config={inputs.config} />,
-    onClose: () => inputs.start(),
-    withCloseButton: false
-  });
-}
-
-export function openPauseModal(inputs: IInputsManager) {
-  inputs.stop();
-  openConfirmModal({
-    size: "xl",
-    trapFocus: false,
-    title: 'Pause',
-    children: (<Text>Click Resume to continue</Text>),
-    onConfirm: () => inputs.start(),
-    withCloseButton: false,
-    labels: { confirm: 'Resume', cancel: ''},
-    cancelProps: {sx: { display: 'none' }}
-  });
-}
-
 export default function WebGLTestPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null!);
-  useEffect(() => {
-    refs.sendRef('canvas', canvasRef);
-  }, [canvasRef])
+  useEffect(() => refs.sendRef('canvas', canvasRef), [canvasRef]);
+
+  const ship = useShip();
   const inputs = useInputManager();
+  const { togglePause, setPause } = usePauseSystem();
+
+  // TODO: (most of) These should be moved as Actions in the inputs bindings
+  // and handled with the rest of them.
   useWindowEvent('keydown', ({code}) => {
     switch(code) {
       case 'KeyP':
-        return openPauseModal(inputs);
+        return togglePause();
       case 'KeyO':
         return inputs.running ? inputs.stop() : inputs.start();
+      case 'KeyL':
+        if (!ship?.current) console.info('⚠️ ship ref is missing');
+        ship.current!.position.x = 0;
+        ship.current!.position.y = 0;
+        ship.current!.position.z = 0;
+        ship.current!.rotation.x = 0;
+        ship.current!.rotation.y = 0;
+        ship.current!.rotation.z = 0;
     }
   })
-  const color = '#2a2a2a';
 
   return (
     <PageLayout
@@ -102,11 +83,12 @@ export default function WebGLTestPage() {
           shadows
           style={{ width: '100%', height: '100%' }}
           onCreated={({gl}) => {
-            gl.setClearColor(color);
-            openControlsModal(inputs);
+            console.info('🎲⚠️ canvas ready')
+            gl.setClearColor('#2a2a2a');
+            setPause(true);
           }}
         >
-          <gridHelper position={[0, -1, 0]} scale={10}  />
+          <gridHelper position={[0, -1, 0]} scale={5} />
           <FlyControls movementSpeed={1} />
           <Scene />
         </Canvas>
@@ -114,34 +96,3 @@ export default function WebGLTestPage() {
     </PageLayout>
   )
 };
-
-
-// function useHandleDebugInputs(shipRef: ReturnType<typeof refs.useShip>) {
-//   const ship = useMemo(() => shipRef?.current, [shipRef?.current])
-//   useWindowEvent('keydown', ({code}) => {
-//     if (!ship) return;
-//     switch(code) {
-//       case 'KeyZ':
-//         ship.position.set(0,0,0);
-//         ship.rotation.set(0,0,0);
-//         // shipState.fwd.current = 0;
-//         // shipState.strafe.current = 0;
-//         // shipState.vertical.current = 0;
-//         break;
-//       case 'KeyY':
-//         // setMouseRotation(); break;
-//         // CONTROLLERS.send('TOGGLE_MOUSE'); break;
-//       case 'Numpad4':
-//         ship.rotation.set(0,degToRad(90),0); break;
-//       case 'Numpad8':
-//         ship.rotation.set(0,degToRad(0),0); break;
-//       case 'Numpad6':
-//         ship.rotation.set(0,degToRad(-90),0); break;
-//       case 'Numpad2':
-//         ship.rotation.set(0,degToRad(180),0); break;
-//       default:
-//         break;
-      
-//     }
-//   });
-// }

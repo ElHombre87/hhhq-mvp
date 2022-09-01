@@ -1,13 +1,13 @@
 import { IControlsManager, IInputsManager } from "./interfaces";
 import { InputsManager } from "./InputsManager";
-import { TControlType } from "./types";
+import { TControllerType } from "../../libs/types";
 
 type MaybeInitialized = { parent?: IInputsManager };
 type Initialized = { parent: IInputsManager };
 
 export abstract class AControlsManager implements IControlsManager {
   public active = false;
-  public abstract readonly type: TControlType;
+  public abstract readonly type: TControllerType;
   public parent?: IInputsManager = undefined;
 
   constructor() {

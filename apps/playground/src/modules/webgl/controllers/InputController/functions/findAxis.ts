@@ -1,11 +1,11 @@
-import { TControlConfig, TControlAxis, TControlsConfig, TControlType } from "../types";
+import { InputConfiguration, InputConfiguration, TConfiguration, TControllerType } from "../../../libs/types";
 
 // Configuration helpers /////////////////////////////////////////////////////////////////////////////////////////////////
 
-export type FilterPredicate<T> = (param: T) => (entry: [axis: string, inputs: TControlConfig[]]) => boolean;
+export type FilterPredicate<T> = (param: T) => (entry: [axis: string, inputs: InputConfiguration[]]) => boolean;
 
 /** predicate for `findAxis` function that returns all controller configurations with the given `type` */
-export  const filterByControlType: FilterPredicate<TControlType> = (type) => ([, options]) => {
+export  const filterByControlType: FilterPredicate<TControllerType> = (type) => ([, options]) => {
   return options.filter(input => input.controller === type).length !== 0;
 }
 
@@ -27,7 +27,7 @@ export  const filterByInputValues: FilterPredicate<string> = (binding) => ([, op
  * @param predicate function to execute the search
  * @returns filtered dictionary (object) of controls configuration.
  */
-export  function findAxis<T>(config: TControlsConfig, predicate: ReturnType<FilterPredicate<T>>): {[key in TControlAxis]?: TControlConfig[]} {
+export  function findAxis<T>(config: TConfiguration, predicate: ReturnType<FilterPredicate<T>>): {[key in InputConfiguration]?: InputConfiguration[]} {
   const entries = Object.entries(config);
   return Object.fromEntries(entries.filter(entry => predicate(entry)))
 }

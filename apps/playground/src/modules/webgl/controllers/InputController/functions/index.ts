@@ -1,8 +1,8 @@
 import {
-  TControlsConfig,
-  TControlConfig,
-  TControlType
-} from "../types";
+  TConfiguration,
+  InputConfiguration,
+  TControllerType
+} from "../../../libs/types";
 
 import { filterByInputValues } from "./findAxis";
 import { extractAxisControls } from "./extractAxisControls";
@@ -21,9 +21,9 @@ function defaultErrorFunction<T extends string>(filter: T): string {
  * containing all the actual configuration for that input plus the controlled `axis` property name.
  */
 export function extractAxisControlByInput(
-  config: TControlsConfig,
+  config: TConfiguration,
   input: string
-): TControlConfig | undefined {
+): InputConfiguration | undefined {
   // @ts-ignore fix typings on return value
   return extractAxisControls(config, input, filterByInputValues, {
     multiple: false,
@@ -32,9 +32,9 @@ export function extractAxisControlByInput(
 }
 
 export function extractAxisControlByController(
-  config: TControlsConfig,
-  input: TControlType
-): TControlConfig[] | [] {
+  config: TConfiguration,
+  input: TControllerType
+): InputConfiguration[] | [] {
   // @ts-ignore fix typings on return value
   return extractAxisControls(config, input, filterByInputValues, {
     multiple: true,

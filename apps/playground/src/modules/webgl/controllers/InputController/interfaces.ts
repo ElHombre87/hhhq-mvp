@@ -1,15 +1,14 @@
 import {
-  TControlAxis,
-  TControlAxisValues,
-  TControlsConfig,
-  TControlType
-} from "./types";
+  TConfiguration,
+  TControllerType
+} from "../../libs/types";
 
 type MaybeInitialized = { parent?: IInputsManager };
 type Initialized = { parent: IInputsManager };
+export type InputConfigurationValues = { [key: string]: number };
 
 export interface IControlsManager {
-  readonly type: TControlType; // static property to identify the controller type
+  readonly type: TControllerType; // static property to identify the controller type
   // parent: IInputsManager;
   active: boolean;
 
@@ -37,21 +36,24 @@ export interface IControlsManagerConstructor {
  */
 export interface IInputsManager {
   running: boolean;
-  config: TControlsConfig;
+  config: TConfiguration;
   controllers: IControlsManager[];
 
-  values: TControlAxisValues;
+  values: InputConfigurationValues;
 
-  start(...values: TControlType[]): void;
-  stop(...values: TControlType[]): void;
+  update(): void;
+  start(...values: TControllerType[]): void;
+  stop(...values: TControllerType[]): void;
 
-  receiveInput(axis: TControlAxis, value: number, source?: TControlType): void;
+  receiveInput(axis: string, value: number, source?: TControllerType): void;
+
+  getController(type: TControllerType): IControlsManager | null;
 }
 
 export interface IInputsManagerConstructor {
   managers: IControlsManager[];
   new (
-    config: TControlsConfig,
+    config: TConfiguration,
     controllers: IControlsManagerConstructor[]
   ): IInputsManager;
 }

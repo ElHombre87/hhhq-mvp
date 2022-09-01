@@ -2,18 +2,18 @@ import { clamp } from "@mantine/hooks";
 import {
   IControlsManager,
   IControlsManagerConstructor,
-  IInputsManager
+  IInputsManager,
+  InputConfigurationValues
 } from "./interfaces";
 import {
-  TControlAxis,
-  TControlAxisValues,
-  TControlsConfig,
-  TControlType
-} from "./types";
+  TConfiguration,
+  TControllerType
+} from "../../libs/types";
 
-type ControllersMap = { [key in TControlType]?: number };
+type ControllersMap = { [key in TControllerType]?: number };
 
-function shouldTrigger(options: TControlType[], type: TControlType) {
+
+function shouldTrigger(options: TControllerType[], type: TControllerType) {
   return options.length === 0 || options.includes(type);
 }
 
@@ -22,16 +22,16 @@ export class InputsManager implements IInputsManager {
   public controllers: IControlsManager[];
   private cMap: ControllersMap;
 
-  public values: TControlAxisValues;
+  public values: InputConfigurationValues;
 
   constructor(
-    public config: TControlsConfig,
+    public config: TConfiguration,
     controllers: IControlsManagerConstructor[] = []
   ) {
     this.controllers = [];
     this.cMap = {};
     // setup initial axis state
-    this.values = {} as TControlAxisValues;
+    this.values = {} as InputConfigurationValues;
     this.setInitialValues();
 
     controllers.forEach((Controller) => {
@@ -46,7 +46,7 @@ export class InputsManager implements IInputsManager {
     this.running = this.controllers.some((c) => c.active);
   }
 
-  receiveInput(axis: TControlAxis, value: number, source: TControlType) {
+  receiveInput(axis: string, value: number, source: TControllerType) {
     let newValue: number;
     const current = this.values[axis];
 
@@ -66,14 +66,14 @@ export class InputsManager implements IInputsManager {
     this.values[axis] = newValue;
   }
 
-  start = (...values: TControlType[]) => {
+  start = (...values: TControllerType[]) => {
     console.info('🎲 starting input manager')
     this.controllers.forEach(({ type, active, ...controller }) => {
       if (shouldTrigger(values, type) && !active) controller.start();
     });
     this.update();
   }
-  stop = (...values: TControlType[]) => {
+  stop = (...values: TControllerType[]) => {
     console.info('🎲 stopping input manager')
     this.controllers.forEach(({ type, active, ...controller }) => {
       if (shouldTrigger(values, type) && active) {
@@ -84,7 +84,7 @@ export class InputsManager implements IInputsManager {
     this.update();
   }
 
-  getController(type: TControlType): IControlsManager | null {
+  getController(type: TControllerType): IControlsManager | null {
     const idx = this.cMap[type];
     if (!idx) return null;
     return this.controllers[idx];
@@ -93,7 +93,7 @@ export class InputsManager implements IInputsManager {
   setInitialValues() {
     this.values = Object.keys(this.config).reduce(
       (p, v) => ({ ...p, [v]: 0 }),
-      {} as TControlAxisValues
+      {} as InputConfigurationValues
     );
   }
 }

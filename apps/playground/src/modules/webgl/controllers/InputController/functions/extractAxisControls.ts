@@ -1,5 +1,5 @@
 
-import { TControlsConfig, TControlConfig } from "../types";
+import { TConfiguration, InputConfiguration } from "../../../libs/types";
 
 import findAxis, { filterByInputValues, filterByControlType } from "./findAxis";
 import type { FilterPredicate } from "./findAxis";
@@ -15,8 +15,8 @@ type ExtractOptions<T = any> =
       error?: (filter: T) => string;
     };
 
-type MultiControl = TControlConfig[] | [];
-type SingleControl = TControlConfig | undefined;
+type MultiControl = InputConfiguration[] | [];
+type SingleControl = InputConfiguration | undefined;
 
 
 // FIXME: Apparently this type isn't exactly working.
@@ -32,7 +32,7 @@ const _defaultOptions = {
 };
 
 export function extractAxisControls<T>(
-  config: TControlsConfig,
+  config: TConfiguration,
   filter: T,
   predicate: FilterPredicate<T>,
   options: ExtractOptions<T>
@@ -44,7 +44,7 @@ export function extractAxisControls<T>(
     if (axisInputs.length > 1) {
       throw new Error(`[extracAxisControl] ${opts.error!(filter)}`);
     }
-    const [, conf] = axisInputs.flat() as [string, TControlConfig[]];
+    const [, conf] = axisInputs.flat() as [string, InputConfiguration[]];
     return conf[0];
   }
 

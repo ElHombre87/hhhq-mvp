@@ -2,7 +2,7 @@ import React from "react";
 import { createStyles, Table, Text } from "@mantine/core";
 
 
-import type { TControlsConfig } from "modules/webgl/controllers/InputController/types";
+import type { TConfiguration } from "modules/webgl/controllers/InputController/types";
 import {  getMaxInputsCount } from "./helpers";
 import { AxisRows } from "./AxisRows";
 
@@ -17,7 +17,7 @@ const useStyles = createStyles((theme) => ({
   }
 }));
 
-export const ConfigTable: React.FC<{ config: TControlsConfig }> = ({
+export const ConfigTable: React.FC<{ config: TConfiguration }> = ({
   config
 }) => {
   const { classes } = useStyles();

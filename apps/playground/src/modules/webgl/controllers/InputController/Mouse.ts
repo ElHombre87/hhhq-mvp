@@ -1,15 +1,15 @@
 import { AControlsManager } from "./AControlsManager";
 
 import type { IInputsManager } from "./interfaces";
-import type { TControlConfig } from "./types";
+import type { InputConfiguration } from "../../libs/types";
 
 import { extractAxisControlByInput } from './functions';
 import { centerNormalize } from "modules/webgl/helpers/math";
 
 export class MouseManager extends AControlsManager {
   public readonly type = "mouse";
-  private xAxisControl?: TControlConfig;
-  private yAxisControl?: TControlConfig;
+  private xAxisControl?: InputConfiguration;
+  private yAxisControl?: InputConfiguration;
 
   setup(parent: IInputsManager) {
     if (super.setup(parent)) {
