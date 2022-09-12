@@ -7,4 +7,5 @@ export default dynamic(() => import('@mantine/rte'), {
 
   // Render anything as fallback on server, e.g. loader or html content without editor
   loading: () => null,
-});
+  // FIXME: typings
+}) as any;

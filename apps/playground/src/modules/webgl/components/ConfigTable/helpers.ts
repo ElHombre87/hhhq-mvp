@@ -1,4 +1,4 @@
-import { TControllerType, InputConfiguration, TConfiguration } from "modules/webgl/controllers/InputController/types";
+import { TControllerType, InputConfiguration, TConfiguration } from "modules/webgl/libs/types";
 import { Icon } from "tabler-icons-react";
 
 export const getIcon = (control: TControllerType, icons: { [key in TControllerType]: Icon }): Icon => icons[control];

@@ -1,4 +1,3 @@
-import { showNotification } from "@mantine/notifications";
 import { Center, Float, Text3D } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState } from "react";

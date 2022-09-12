@@ -2,7 +2,7 @@ import { createConfiguration } from "../libs";
 
 
 export const config = createConfiguration({
-  defaults: {},
+  defaults: { scale: 1, type: 'digital' },
 },{
   forward: [
     {

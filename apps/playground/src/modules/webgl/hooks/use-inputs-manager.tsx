@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { config } from "../config/config.inputs";
+import { config } from "../config";
 import { InputsManager, KeyboardManager, MouseManager } from "../controllers/InputController";
 
 export const inputs = new InputsManager(config, [KeyboardManager, MouseManager]);
