@@ -27,7 +27,7 @@ function parseTransform(obj: Object3D): {position: [number, number, number], rot
   return { position: [p.x, p.y, p.z], rotation: [r.x, r.y, r.z] }
 }
 
-function updateObjectTransform(object: Object3D,mesh: Object3D, inputs: Values, dt: number) {
+function updateObjectTransform(object: Object3D, mesh: Object3D, inputs: Values, dt: number) {
   if (!object) return
   object.rotateOnAxis(AY, inputs.yaw * dt)
   object.rotateOnAxis(AX, inputs.pitch * dt)
@@ -36,8 +36,8 @@ function updateObjectTransform(object: Object3D,mesh: Object3D, inputs: Values, 
   object.translateY(inputs.up * dt)
   object.translateZ(inputs.forward * dt)
   if (mesh) {
-    mesh.rotation.z = MathUtils.degToRad(15) * -inputs.yaw;
-    mesh.rotation.x = MathUtils.degToRad(15) * inputs.pitch;
+    mesh.rotation.z = MathUtils.degToRad(5* -inputs.left);
+    mesh.rotation.x = MathUtils.degToRad(5 * inputs.pitch);
   }
 }
 function centerObject(object: Object3D) {
