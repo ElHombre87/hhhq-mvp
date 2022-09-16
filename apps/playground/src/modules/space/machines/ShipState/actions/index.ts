@@ -36,19 +36,20 @@ export function updateVelocities<Axis extends string, Actions extends string>(
   for (let axis of objKeys(velocity)) {
     const current = velocity[axis]
     const config = settings[axis]
-    const { max, acceleration, inertial } = config
+    const { max, acceleration, inertial, shouldBreak = true } = config
 
     const input = event.values[axis]
 
     let value =
       computeSpeed(current, acceleration, input, inertial) +
-      computeBreaks(current, acceleration, breaking)
+      (shouldBreak ? computeBreaks(current, acceleration, breaking) : 0)
 
     if (isInertial(config) && config.reset) {
+      const { resetFactor = 1 } = config
       const noInput = isNearly(input, 0, 0.05)
       const isMoving = !isNearly(value, 0, 0.0005)
       const shouldReset = noInput && isMoving
-      value += (shouldReset ? computeBreaks(current, acceleration / 2, true) : 0)
+      value += (shouldReset ? computeBreaks(current, acceleration * resetFactor, true) : 0)
     }
 
     out[axis] = clamp(value, -max, max)

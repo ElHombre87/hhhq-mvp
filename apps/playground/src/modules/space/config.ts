@@ -2,7 +2,7 @@ import { InputsConfiguration } from './configuration'
 import { AxisSettings } from './machines';
 
 export const AXIS = ['forward', 'left', 'up', 'yaw', 'roll', 'pitch'] as const
-export const ACTIONS = ['fire', 'break'] as const
+export const ACTIONS = ['break'] as const
 
 export type TAxis = typeof AXIS[number];
 export type TAction = typeof ACTIONS[number];
@@ -108,20 +108,16 @@ export const inputs = new InputsConfiguration({
       type: 'action',
       bindings: [{ controller: 'keyboard', inputs: ['Space'] }],
     },
-    fire: {
-      type: 'action',
-      bindings: [{ controller: 'mouse', inputs: ['0'] }], // TODO: correct input for primary key
-    },
   },
 })
 
 export const axisSettings: AxisSettings<TAxis> = {
   forward: { max: 3, acceleration: 0.025, inertial: true },
-  left: { max: 1, acceleration: 0.0075, inertial: true, reset: true },
+  left: { max: 1, acceleration: 0.0075, inertial: true, reset: true, resetFactor: 3 },
   up: { max: 0.5, acceleration: 0.005, inertial: true, reset: true },
   // TODO: non inertial axis should have just a single value, since they do not accelerate
   // but map the relative input value directly
-  pitch: { max: 1, acceleration: 1 },
-  yaw: { max: 1, acceleration: 1, },
-  roll: { max: 1, acceleration: 0.05, inertial: true, reset: true },
+  pitch: { max: 1, acceleration: 1, shouldBreak: false },
+  yaw: { max: 1, acceleration: 1, shouldBreak: false },
+  roll: { max: 1, acceleration: 0.05, inertial: true, reset: true, shouldBreak: false },
 }

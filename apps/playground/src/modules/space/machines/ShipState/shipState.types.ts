@@ -1,16 +1,22 @@
 export interface BaseStateAxisSettings {
   max: number;
   acceleration: number;
-  inertial?: false;
+  inertial?: boolean;
+  /** if false any breaking action won't have effect. defaults to `true` */
+  shouldBreak?: boolean;
 }
-export interface InertialStateAxisSettings {
+export interface StandardStateAxisSettings extends BaseStateAxisSettings {
+  inertial?: false
+}
+export interface InertialStateAxisSettings extends BaseStateAxisSettings {
   max: number;
   acceleration: number;
   inertial: true;
   reset?: boolean;
+  resetFactor?: number
 }
 
-export type StateAxisSettings = BaseStateAxisSettings | InertialStateAxisSettings;
+export type StateAxisSettings = StandardStateAxisSettings | InertialStateAxisSettings;
 
 export type StateTransform = {
   position: [x:number, y:number, z:number];
