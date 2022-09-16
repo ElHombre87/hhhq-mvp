@@ -2,13 +2,13 @@ import React from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Mesh } from 'three'
 import { useSelector } from '@xstate/react'
-import { Sphere, PerspectiveCamera, Stars } from '@react-three/drei'
+import { Sphere, Stars } from '@react-three/drei'
 import { closeAllModals } from '@mantine/modals'
 
 // import { rotateOnWorldAxisWithInputs } from "../../functions/three";
 
 import { Player } from './Player.component'
-import { useControlsModal, usePauseMouse, useStateActions } from '../../hooks'
+import { useControlsModal, usePauseControls, useStateActions } from '../../hooks'
 
 import { usePlayerService } from 'modules/space/hooks/use-player-service'
 import { useWindowEvent } from '@mantine/hooks'
@@ -59,14 +59,10 @@ export const CanvasRoot: React.FC = () => {
       actions.pause()
     }
   }, [])
-  usePauseMouse('KeyX')
-  usePauseMouse('KeyG', true)
+  usePauseControls('Escape')
+  // temporary pause
+  usePauseControls('KeyG', true)
 
-  useWindowEvent('keypress', e => {
-    if (e.code === 'KeyZ') {
-      actions.pause('controls')
-    }
-  })
   return (
     <Canvas
       camera={{ position: [0, 1, 3] }}
