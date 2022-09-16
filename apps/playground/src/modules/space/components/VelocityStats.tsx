@@ -21,12 +21,12 @@ export const Velocity = <T extends string>({axis, reverse, velocity, settings,..
   
   const barValues = (axis: T) => ({value: velocity[axis], max: settings[axis].max })
   return (
-    <Stack spacing="xs">
+    <Group grow position="center" spacing="xs">
       <StatBadge value={velocity[axis]} {...props} reverse={reverse}/>
       <Group grow spacing={0}>
         <SpeedIndicator {...barValues(axis)} reverse={reverse} />
       </Group>
-    </Stack>
+    </Group>
   )
 }
 
@@ -39,13 +39,13 @@ export const VelocityStats = () => {
   return (
     <>
       <Stack>
-        <Divider label="Position" labelPosition="center"/>
+        <Divider label="Translate" labelPosition="center"/>
 
         <Velocity settings={settings} velocity={velocity} axis="left" label="X" color="red" reverse/>
         <Velocity settings={settings} velocity={velocity} axis="up" label="Y" color="green"/>
         <Velocity settings={settings} velocity={velocity} axis="forward" label="Z" color="blue" />
 
-        <Divider label="Rotation" labelPosition="center"/>
+        <Divider label="Rotate" labelPosition="center"/>
 
         <Velocity settings={settings} velocity={velocity} axis="pitch" label="X" color="red" reverse/>
         <Velocity settings={settings} velocity={velocity} axis="yaw" label="Y" color="green" reverse/>
