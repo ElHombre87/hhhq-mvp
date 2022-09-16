@@ -5,8 +5,11 @@ import { Ship } from 'modules/space/assets'
 import { usePlayerService } from 'modules/space/hooks/use-player-service'
 // import { useSelector } from '@xstate/react'
 import React from 'react'
-import { Group, Mesh, Object3D, Vector3, MathUtils } from 'three'
+import { Group, Mesh, Object3D, Vector3, MathUtils, Euler } from 'three'
+import { degToRad } from 'three/src/math/MathUtils'
 import { usePlayerVelocity, useStateActions } from '../../hooks'
+import { FollowCamera } from './Camera.component'
+import { _Debugger } from './_Debugger'
 interface Values {
   yaw: number;
   pitch: number;
@@ -35,8 +38,8 @@ function updateObjectTransform(object: Object3D, mesh: Object3D, inputs: Values,
   object.translateY(inputs.up * dt)
   object.translateZ(inputs.forward * dt)
   if (mesh) {
-    mesh.rotation.z = MathUtils.degToRad(5* -inputs.left);
-    mesh.rotation.x = MathUtils.degToRad(5 * inputs.pitch);
+    mesh.rotation.z = MathUtils.degToRad(10* inputs.left);
+    mesh.rotation.x = MathUtils.degToRad(10 * inputs.pitch);
   }
 }
 function centerObject(object: Object3D) {
@@ -49,22 +52,10 @@ function centerObject(object: Object3D) {
   object.rotation.z = 0
 }
 
-/** updates the active camera transform to follow the 'player' */
-function updateFollowCamera(camera: THREE.Camera, target: THREE.Object3D) {
-  if (!camera || !target) return;
-  const newZ = -7;
-  const newY = 2;
-  const relativeCameraOffset = new Vector3(0, newY, newZ);
-  let offset = relativeCameraOffset.applyMatrix4(target.matrixWorld);
-  camera.position.set(offset.x, offset.y, offset.z);
-  camera.lookAt(target.position);
-}
-
-
 export const Player: React.FC<GroupProps> = ((props) => {
   const player = React.useRef<Group>(null!)
   const mesh = React.useRef<Group>(null!)
-  const camera = React.useRef<THREE.Camera>(null!);
+  // const camera = React.useRef<THREE.Camera>(null!);
 
   const service = usePlayerService()
   const velocity = usePlayerVelocity(service)
@@ -90,29 +81,16 @@ export const Player: React.FC<GroupProps> = ((props) => {
      * for time constraints reasons
      */
     actions.updateState(parseTransform(player.current));
-    if (camera?.current && player?.current)
-      updateFollowCamera(camera?.current, player?.current);
   })
 
   return (
     <>
     <group ref={player} {...props} scale={0.25} rotation={[0, 0, 0]}>
-      <Ship ref={mesh}/>
+      {/* somehow the ship mesh needs to be rotated */}
+      <Ship ref={mesh} rotation={[0, Math.PI, 0]}/>
     </group>
-    <PerspectiveCamera ref={camera} makeDefault fov={70} near={0.1} far={50000} name="main-camera" />
-    <Debugger target={player.current} />
+    <FollowCamera target={player.current} />
+    <_Debugger target={player.current} />
   </>
   )
 })
-
-const Debugger: React.FC<{target: THREE.Object3D}> = ({target}) => {
-  const axes = React.useRef<THREE.AxesHelper>(null!);
-  useFrame(({}) => {
-    if (!target) return;
-    axes.current.position.set(target.position.x, target.position.y, target.position.z)
-    axes.current.rotation.set(target.rotation.x, target.rotation.y, target.rotation.z)
-  })
-  return (
-    <axesHelper ref={axes}/>
-  )
-}

@@ -19,7 +19,7 @@ export const Toolbar: React.FC = () => {
   return (
     <Group>
       <Button uppercase leftIcon={<DeviceGamepad2 size={18}/>} onClick={toggleService} color={activeColor(active)}>
-        {active ? 'Running' : 'Stopped'}
+        Controls
       </Button>
       <Divider orientation='vertical' />
       <Group position="center" grow>

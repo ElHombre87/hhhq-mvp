@@ -41,15 +41,15 @@ export const VelocityStats = () => {
       <Stack>
         <Divider label="Translate" labelPosition="center"/>
 
-        <Velocity settings={settings} velocity={velocity} axis="left" label="X" color="red" reverse/>
-        <Velocity settings={settings} velocity={velocity} axis="up" label="Y" color="green"/>
-        <Velocity settings={settings} velocity={velocity} axis="forward" label="Z" color="blue" />
+        <Velocity settings={settings} velocity={velocity} axis="left" label="X" color="red" />
+        <Velocity settings={settings} velocity={velocity} axis="up" label="Y" color="green" reverse/>
+        <Velocity settings={settings} velocity={velocity} axis="forward" label="Z" color="blue"reverse />
 
         <Divider label="Rotate" labelPosition="center"/>
 
-        <Velocity settings={settings} velocity={velocity} axis="pitch" label="X" color="red" reverse/>
-        <Velocity settings={settings} velocity={velocity} axis="yaw" label="Y" color="green" reverse/>
-        <Velocity settings={settings} velocity={velocity} axis="roll" label="Z" color="blue" />
+        <Velocity settings={settings} velocity={velocity} axis="pitch" label="X" color="red" />
+        <Velocity settings={settings} velocity={velocity} axis="yaw" label="Y" color="green" />
+        <Velocity settings={settings} velocity={velocity} axis="roll" label="Z" color="blue" reverse/>
       </Stack>
     </>
   )
