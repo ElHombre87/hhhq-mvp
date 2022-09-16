@@ -66,15 +66,15 @@ export const Debugger: React.FC = () => {
             <Stack>
               <Divider label="Position" labelPosition="center"/>
               <Stack spacing="xs">
-                <TransformBadge value={transform.position[0]} axis="x" />
-                <TransformBadge value={transform.position[1]} axis="y" />
-                <TransformBadge value={transform.position[2]} axis="z" />
+                <TransformBadge value={transform.position.x} axis="x" />
+                <TransformBadge value={transform.position.y} axis="y" />
+                <TransformBadge value={transform.position.z} axis="z" />
               </Stack>
               <Divider label="Rotation" labelPosition="center"/>
               <Stack spacing="xs">
-                <TransformBadge value={transform.rotation[0]} axis="x" />
-                <TransformBadge value={transform.rotation[1]} axis="y" />
-                <TransformBadge value={transform.rotation[2]} axis="z" />
+                <TransformBadge value={transform.rotation.x} axis="x" />
+                <TransformBadge value={transform.rotation.y} axis="y" />
+                <TransformBadge value={transform.rotation.z} axis="z" />
               </Stack>
             </Stack>
           </Collapse>

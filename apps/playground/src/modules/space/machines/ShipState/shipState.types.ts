@@ -19,8 +19,10 @@ export interface InertialStateAxisSettings extends BaseStateAxisSettings {
 export type StateAxisSettings = StandardStateAxisSettings | InertialStateAxisSettings;
 
 export type StateTransform = {
-  position: [x:number, y:number, z:number];
-  rotation: [x:number, y:number, z:number];
+  position: THREE.Vector3;
+  rotation: THREE.Euler;
+  // position: [x:number, y:number, z:number];
+  // rotation: [x:number, y:number, z:number];
 }
 export interface ShipStateContext<Axis extends string, Actions extends string> {
   id: string;

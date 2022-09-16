@@ -4,6 +4,8 @@ import { isEventType } from '../functions'
 import { updateVelocities } from './actions'
 import type { ShipStateContext, ShipStateEvent, StateAxisSettings } from './shipState.types'
 
+import * as THREE from 'three'
+
 export type AxisSettings<Axis extends string = string> = Record<Axis, StateAxisSettings>;
 
 export type TStateMachine<A extends string, B extends string> = typeof createShipStateMachine<A,B>;
@@ -25,14 +27,6 @@ function setupInitials<T extends string>(arr: readonly T[], v = 0) {
   return arr.reduce((p, k) => ({ ...p, [k]: v }), {} as { [k in T]: number })
 }
 
-type Values = [x:number, y:number, z:number]
-function updateTransformValues(current:Values, next:Values): [boolean, Values] {
-  if (current.every((v, i) => v === next[i])) {
-    return [false, current]
-  }
-  return [true, next]
-}
-
 // State machine factory //////////////////////////////////////////////////////
 export const createShipStateMachine = <Axis extends string, Actions extends string>({
   id,
@@ -47,8 +41,8 @@ export const createShipStateMachine = <Axis extends string, Actions extends stri
     velocity: setupInitials(axis),
     actions: setupInitials(actions),
     transform: {
-      position: [0, 0, 0],
-      rotation: [0, 0, 0],
+      position: new THREE.Vector3(0,0,0), // [0, 0, 0],
+      rotation: new THREE.Euler(0,0,0, 'XYZ'), //[0, 0, 0],
     }
   })
 
@@ -132,11 +126,14 @@ export const createShipStateMachine = <Axis extends string, Actions extends stri
         }),
         onUpdateTransform: assign((context, event) => {
           if (!isEventType(event, 'UPDATE_TRANSFORM')) return {}
-          const current = context.transform
-          const [pChanged, position] = updateTransformValues(current.position, event.position)
-          const [rChanged, rotation] = updateTransformValues(current.rotation, event.rotation)
-          // nothing changed. do not update the context.
-          if (!pChanged && !rChanged) return {}
+          const { position, rotation } = context.transform
+          
+          if (position.equals(event.position) && rotation.equals(event.rotation))
+            return {}
+
+          position.copy(event.position)
+          rotation.copy(event.rotation)
+          // needs return for context update even if object is the same
           return { transform: { position, rotation, } }
         }),
 

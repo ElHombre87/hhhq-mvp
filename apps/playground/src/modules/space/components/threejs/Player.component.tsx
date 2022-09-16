@@ -20,11 +20,10 @@ const AX = new Vector3(1, 0, 0)
 const AY = new Vector3(0, 1, 0)
 const AZ = new Vector3(0, 0, 1)
 
-// export const initialRotation = new Euler(degToRad(45), 0, degToRad(45));
-function parseTransform(obj: Object3D): {position: [number, number, number], rotation: [number, number, number]} {
+function parseTransform(obj: Object3D) {
   const p = obj.position
   const r = obj.rotation
-  return { position: [p.x, p.y, p.z], rotation: [r.x, r.y, r.z] }
+  return { position: p, rotation: r}
 }
 
 function updateObjectTransform(object: Object3D, mesh: Object3D, inputs: Values, dt: number) {
@@ -86,7 +85,7 @@ export const Player: React.FC<GroupProps> = ((props) => {
     if (!player.current || !mesh.current) return
     updateObjectTransform(player.current, mesh.current, velocity, dt)
     /**
-     * @dev this is a separate object because for now we're pulling
+     * @dev this is a separate call because for now we're pulling
      * the evaluated transform from the scene instead of computing it outside
      * for time constraints reasons
      */
