@@ -54,7 +54,7 @@ const links: TNavLink[] = [
   Link({
     label: 'ThreeJS',
     icon: ThreeDCubeSphere,
-    href: '/threejs/test',
+    href: '/threejs',
     description: 'ThreeJS playground',
   }),
 ];
