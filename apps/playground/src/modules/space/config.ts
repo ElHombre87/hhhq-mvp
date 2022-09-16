@@ -70,7 +70,7 @@ export const inputs = new InputsConfiguration({
           controller: 'mouse',
           inputs: ['x'],
           scale: -1,
-          deadzone: 0.01,
+          deadzone: 0.02,
         },
       ],
     },
@@ -82,7 +82,7 @@ export const inputs = new InputsConfiguration({
           controller: 'mouse',
           inputs: ['y'],
           scale: 1,
-          deadzone: 0.01,
+          deadzone: 0.02,
         },
       ],
     },
@@ -123,6 +123,5 @@ export const axisSettings: AxisSettings<TAxis> = {
   // but map the relative input value directly
   pitch: { max: 1, acceleration: 1 },
   yaw: { max: 1, acceleration: 1, },
-  // roll: { max: 1, acceleration: 1, },
-  roll: { max: 5, acceleration: .005, inertial: true, reset: true },
+  roll: { max: 1, acceleration: 0.05, inertial: true, reset: true },
 }
