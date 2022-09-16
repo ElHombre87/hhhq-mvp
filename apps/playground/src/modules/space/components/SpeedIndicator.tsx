@@ -12,7 +12,7 @@ function evalPercent(current: number, max: number, reverse = false) {
   return ((current / max) * 100 * (reverse ? -1 : 1)).toFixed(2)
 }
 
-export const SpeedIndicator: React.FC<ISpeedBar & ProgressProps> = ({value, max, reverse, colors = {pos:'teal', neg: 'orange'}, ...props}) => {
+export const SpeedIndicator: React.FC<ISpeedBar & ProgressProps> = ({value, max, reverse, colors = {pos:'teal', neg: 'yellow'}, ...props}) => {
   const v = value * (reverse ? -1 : 1)
   // const barValue = Math.abs(+evalPercent(value+max * (reverse ? -1 : 1), max*2));
   const barValueP = +evalPercent(v, max)

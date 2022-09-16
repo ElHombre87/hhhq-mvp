@@ -60,6 +60,7 @@ export const CanvasRoot: React.FC = () => {
     }
   }, [])
   usePauseMouse('KeyX')
+  usePauseMouse('KeyG', true)
 
   useWindowEvent('keypress', e => {
     if (e.code === 'KeyZ') {

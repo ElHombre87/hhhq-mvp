@@ -1,5 +1,6 @@
 export * from './ConfigTable'
-export * from './ControlButton'
+export * from './ControllerToggle.Button'
+export * from './ControlsModal.Button'
 export * from './SpeedIndicator'
 export * from './Toolbar'
 export * from './StatBadge'
